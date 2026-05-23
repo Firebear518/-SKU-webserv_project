@@ -1,0 +1,22 @@
+# 컴파일된 클래스 파일
+*.class
+
+# 로그 파일 및 임시 파일
+*.log
+tmp/
+
+# Eclipse 관련 설정 파일
+.metadata/
+.settings/
+.project
+.classpath
+.factorypath
+
+# 빌드 결과물 경로
+/build/
+/target/
+/bin/
+
+# 로컬 서버 설정 파일
+Servers/
+.recommenders/
