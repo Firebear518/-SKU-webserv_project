@@ -1,25 +1,70 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import dto.Auction;
 import dto.Bid;
+import util.DBUtil;
 
 public class BidDAO {
 
     public boolean insertBid(Bid bid) {
         String sql = "INSERT INTO bid (auction_id, user_id, bid_price) VALUES (?, ?, ?)";
 
-        // TODO: DB 연결 후 구현
+        try (
+            Connection conn = DBUtil.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setInt(1, bid.getAuctionId());
+            pstmt.setInt(2, bid.getUserId());
+            pstmt.setInt(3, bid.getBidPrice());
+
+            int result = pstmt.executeUpdate();
+
+            return result > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return false;
     }
 
     public boolean placeBid(int auctionId, int userId, int bidPrice) {
-        // TODO:
-        // 1. auction 조회
-        // 2. 경매 상태 ONGOING 확인
-        // 3. 입찰가가 현재가보다 높은지 확인
-        // 4. bid insert
-        // 5. auction current_price, highest_bidder_id 갱신
+        AuctionDAO auctionDAO = new AuctionDAO();
 
-        return false;
+        Auction auction = auctionDAO.getAuctionById(auctionId);
+
+        if (auction == null) {
+            return false;
+        }
+
+        if (!"ONGOING".equals(auction.getAuctionStatus())) {
+            return false;
+        }
+
+        if (bidPrice <= auction.getCurrentPrice()) {
+            return false;
+        }
+
+        Bid bid = new Bid();
+        bid.setAuctionId(auctionId);
+        bid.setUserId(userId);
+        bid.setBidPrice(bidPrice);
+
+        boolean insertResult = insertBid(bid);
+
+        if (!insertResult) {
+            return false;
+        }
+
+        boolean updateResult = auctionDAO.updateCurrentPriceAndBidder(
+            auctionId,
+            bidPrice,
+            userId
+        );
+
+        return updateResult;
     }
 }
