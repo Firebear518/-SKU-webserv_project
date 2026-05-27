@@ -21,7 +21,3 @@ tmp/
 # 보안 및 API 키 설정 파일
 config.properties
 *.env
-
-# 외부 라이브러리 파일 제외
-*.jar
-webserv_project/src/main/webapp/WEB-INF/lib/
