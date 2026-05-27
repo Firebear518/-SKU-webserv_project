@@ -2,7 +2,8 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import dto.Auction;
 import dto.Bid;
 import util.DBUtil;
@@ -44,6 +45,11 @@ public class BidDAO {
             return false;
         }
 
+        if (isAuctionExpired(auction.getEndTime())) {
+            auctionDAO.updateAuctionStatus(auctionId, "ENDED");
+            return false;
+        }
+
         if (bidPrice <= auction.getCurrentPrice()) {
             return false;
         }
@@ -66,5 +72,19 @@ public class BidDAO {
         );
 
         return updateResult;
+    }
+    
+    private boolean isAuctionExpired(String endTime) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime auctionEndTime = LocalDateTime.parse(endTime, formatter);
+            LocalDateTime now = LocalDateTime.now();
+
+            return now.isAfter(auctionEndTime);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
     }
 }
