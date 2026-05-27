@@ -1,0 +1,2 @@
+# AI API 인증 키 (실제 키를 넣고 파일명을 config.properties로 변경해서 사용하세요.)
+AI_API_KEY=YOUR_ACTUAL_API_KEY_HERE
