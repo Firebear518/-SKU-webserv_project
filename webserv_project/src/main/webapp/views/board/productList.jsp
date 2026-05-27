@@ -1,0 +1,236 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>올댓카드 - 경매장</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* 1. 카테고리 탭 버튼 커스텀 */
+        .category-btn {
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        /* 2. 경매 카드 디자인 */
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #fff;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+        }
+        
+        /* 카드 내 이미지 비율 고정 */
+        .card-img-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 130%; 
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+        .card-img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; 
+            padding: 10px;
+        }
+
+        /* 경매 마감 임박 레이블 */
+        .time-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        /* 실시간 가격 텍스트 색상 */
+        .price-text {
+            color: #dc3545;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <jsp:include page="/views/common/header.jsp" />
+
+    <div class="container my-5">
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8 text-center">
+                <h2 class="fw-bold text-dark mb-4"><i class="bi bi-hammer text-warning"></i> 실시간 카드 경매장</h2>
+                <form action="${pageContext.request.contextPath}/board/list.do" method="get">
+                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden bg-white p-1 border">
+                        <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search ms-2"></i></span>
+                        <input type="text" name="searchKeyword" class="form-control border-0 bg-transparent fs-6" placeholder="카드 이름, 등급, 세트명 등으로 검색해 보세요...">
+                        <input type="hidden" id="currentCategoryInput" name="category" value="ALL">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold fs-6 me-1">검색</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-2 mb-5 flex-wrap" id="categoryTabContainer">
+            <button type="button" class="btn btn-primary category-btn" onclick="filterCategory('ALL', this)">전체</button>
+            <button type="button" class="btn btn-outline-secondary category-btn" onclick="filterCategory('POKEMON', this)">포켓몬 카드</button>
+            <button type="button" class="btn btn-outline-secondary category-btn" onclick="filterCategory('YUGIOH', this)">유희왕</button>
+            <button type="button" class="btn btn-outline-secondary category-btn" onclick="filterCategory('SPORTS', this)">스포츠 카드</button>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="productGridContainer">
+            
+            <div class="col product-item" data-category="POKEMON">
+                <div class="card product-card h-100 shadow-sm" onclick="location.href='${pageContext.request.contextPath}/views/board/productDetail.jsp'">
+                    <div class="card-img-wrapper">
+                        <span class="time-badge"><i class="bi bi-clock-fill"></i> 04일 남음</span>
+                        <img src="https://images.pokemontcg.io/sv6/193_hires.png" alt="카드 이미지">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-3">
+                        <div>
+                            <span class="badge bg-primary mb-2" style="font-size: 0.7rem;">포켓몬 카드</span>
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">메가개굴닌자ex SAR</h6>
+                            <p class="text-muted extra-small mb-2" style="font-size: 0.8rem;">출품자: pokemon_master</p>
+                        </div>
+                        <div class="border-top pt-2 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-secondary">현재 최고가</span>
+                                <span class="fs-5 price-text">₩ 85,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col product-item" data-category="YUGIOH">
+                <div class="card product-card h-100 shadow-sm" onclick="location.href='#'">
+                    <div class="card-img-wrapper">
+                        <span class="time-badge bg-warning text-dark"><i class="bi bi-clock-fill"></i> 02시간 남음</span>
+                        <img src="https://images.ygoprodeck.com/images/cards/89631139.jpg" alt="카드 이미지">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-3">
+                        <div>
+                            <span class="badge bg-danger mb-2" style="font-size: 0.7rem;">유희왕</span>
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">푸른 눈의 백룡 (Prismatic Secret)</h6>
+                            <p class="text-muted extra-small mb-2" style="font-size: 0.8rem;">출품자: yugioh_king</p>
+                        </div>
+                        <div class="border-top pt-2 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-secondary">현재 최고가</span>
+                                <span class="fs-5 price-text">₩ 420,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col product-item" data-category="SPORTS">
+                <div class="card product-card h-100 shadow-sm" onclick="location.href='#'">
+                    <div class="card-img-wrapper">
+                        <span class="time-badge"><i class="bi bi-clock-fill"></i> 07일 남음</span>
+                        <img src="https://images.pokemontcg.io/sv5/102_hires.png" alt="카드 이미지">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-3">
+                        <div>
+                            <span class="badge bg-success mb-2" style="font-size: 0.7rem;">스포츠 카드</span>
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">오타니 쇼헤이 2024 MVP 루키 복각 한정판</h6>
+                            <p class="text-muted extra-small mb-2" style="font-size: 0.8rem;">출품자: mlb_collector</p>
+                        </div>
+                        <div class="border-top pt-2 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-secondary">현재 최고가</span>
+                                <span class="fs-5 price-text">₩ 1,250,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col product-item" data-category="POKEMON">
+                <div class="card product-card h-100 shadow-sm" onclick="location.href='#'">
+                    <div class="card-img-wrapper">
+                        <span class="time-badge bg-dark"><i class="bi bi-clock-fill"></i> 마감 직전 (5분)</span>
+                        <img src="https://images.pokemontcg.io/sv6/168_hires.png" alt="카드 이미지">
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between p-3">
+                        <div>
+                            <span class="badge bg-primary mb-2" style="font-size: 0.7rem;">포켓몬 카드</span>
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">피카츄AR (초특급 상태 보장)</h6>
+                            <p class="text-muted extra-small mb-2" style="font-size: 0.8rem;">출품자: pika_pika</p>
+                        </div>
+                        <div class="border-top pt-2 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small text-secondary">현재 최고가</span>
+                                <span class="fs-5 price-text">₩ 15,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="text-center py-5 d-none" id="noItemAlert">
+            <i class="bi bi-exclamation-triangle text-muted display-1"></i>
+            <h4 class="text-secondary mt-3 fw-bold">해당 카테고리에 진행 중인 경매 상품이 없습니다.</h4>
+        </div>
+
+    </div>
+
+    <jsp:include page="/views/common/footer.jsp" />
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function filterCategory(categoryKey, targetBtn) {
+            document.getElementById('currentCategoryInput').value = categoryKey;
+
+            const buttons = document.querySelectorAll('#categoryTabContainer .category-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-secondary');
+            });
+            targetBtn.classList.remove('btn-outline-secondary');
+            targetBtn.classList.add('btn-primary');
+
+            const items = document.querySelectorAll('.product-item');
+            let visibleCount = 0;
+
+            items.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                
+                if (categoryKey === 'ALL' || itemCategory === categoryKey) {
+                    item.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            const alertBox = document.getElementById('noItemAlert');
+            if (visibleCount === 0) {
+                alertBox.classList.remove('d-none');
+            } else {
+                alertBox.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
+</html>
