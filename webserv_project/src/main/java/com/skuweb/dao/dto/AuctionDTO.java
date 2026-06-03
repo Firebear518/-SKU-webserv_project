@@ -1,6 +1,6 @@
-package dto;
+package com.skuweb.dao.dto;
 
-public class Auction {
+public class AuctionDTO {
     private int auctionId;
     private int productId;
     private int startPrice;

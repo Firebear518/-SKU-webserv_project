@@ -1,14 +1,17 @@
-package servlet;
+package com.skuweb.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import dao.BidDAO;
+import com.skuweb.dao.BidDAO;
+import com.skuweb.dao.dto.BidResultDTO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/bid")
 public class BidServlet extends HttpServlet {
@@ -28,18 +31,26 @@ public class BidServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            int auctionId = Integer.parseInt(request.getParameter("auctionId"));
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            int bidPrice = Integer.parseInt(request.getParameter("bidPrice"));
+        	int auctionId = Integer.parseInt(request.getParameter("auctionId"));
+        	int bidPrice = Integer.parseInt(request.getParameter("bidPrice"));
+
+        	HttpSession session = request.getSession(false);
+
+        	if (session == null || session.getAttribute("userId") == null) {
+        	    out.print("{\"success\":false,\"message\":\"로그인이 필요합니다.\",\"currentPrice\":0}");
+        	    return;
+        	}
+
+        	int userId = (int) session.getAttribute("userId");
 
             BidDAO bidDAO = new BidDAO();
-            boolean result = bidDAO.placeBid(auctionId, userId, bidPrice);
+            BidResultDTO result = bidDAO.placeBid(auctionId, userId, bidPrice);
 
-            if (result) {
-                out.print("{\"success\":true, \"message\":\"입찰 성공\"}");
-            } else {
-                out.print("{\"success\":false, \"message\":\"입찰 실패\"}");
-            }
+            out.print("{");
+            out.print("\"success\":" + result.isSuccess() + ",");
+            out.print("\"message\":\"" + result.getMessage() + "\",");
+            out.print("\"currentPrice\":" + result.getCurrentPrice());
+            out.print("}");
 
         } catch (NumberFormatException e) {
             out.print("{\"success\":false, \"message\":\"잘못된 요청 값입니다.\"}");
