@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/bid")
 public class BidServlet extends HttpServlet {
@@ -30,9 +31,17 @@ public class BidServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            int auctionId = Integer.parseInt(request.getParameter("auctionId"));
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            int bidPrice = Integer.parseInt(request.getParameter("bidPrice"));
+        	int auctionId = Integer.parseInt(request.getParameter("auctionId"));
+        	int bidPrice = Integer.parseInt(request.getParameter("bidPrice"));
+
+        	HttpSession session = request.getSession(false);
+
+        	if (session == null || session.getAttribute("userId") == null) {
+        	    out.print("{\"success\":false,\"message\":\"로그인이 필요합니다.\",\"currentPrice\":0}");
+        	    return;
+        	}
+
+        	int userId = (int) session.getAttribute("userId");
 
             BidDAO bidDAO = new BidDAO();
             BidResultDTO result = bidDAO.placeBid(auctionId, userId, bidPrice);
