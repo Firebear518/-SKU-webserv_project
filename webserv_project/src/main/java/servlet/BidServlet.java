@@ -3,7 +3,9 @@ package servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import dao.BidDAO;
+import com.skuweb.dao.BidDAO;
+import com.skuweb.dao.dto.BidResultDTO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,13 +35,13 @@ public class BidServlet extends HttpServlet {
             int bidPrice = Integer.parseInt(request.getParameter("bidPrice"));
 
             BidDAO bidDAO = new BidDAO();
-            boolean result = bidDAO.placeBid(auctionId, userId, bidPrice);
+            BidResultDTO result = bidDAO.placeBid(auctionId, userId, bidPrice);
 
-            if (result) {
-                out.print("{\"success\":true, \"message\":\"입찰 성공\"}");
-            } else {
-                out.print("{\"success\":false, \"message\":\"입찰 실패\"}");
-            }
+            out.print("{");
+            out.print("\"success\":" + result.isSuccess() + ",");
+            out.print("\"message\":\"" + result.getMessage() + "\",");
+            out.print("\"currentPrice\":" + result.getCurrentPrice());
+            out.print("}");
 
         } catch (NumberFormatException e) {
             out.print("{\"success\":false, \"message\":\"잘못된 요청 값입니다.\"}");

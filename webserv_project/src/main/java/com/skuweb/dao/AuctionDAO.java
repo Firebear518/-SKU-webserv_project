@@ -1,17 +1,18 @@
-package dao;
+package com.skuweb.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import dto.Auction;
+import com.skuweb.dao.dto.AuctionDTO;
+
 import util.DBUtil;
 
 public class AuctionDAO {
 
-    public Auction getAuctionById(int auctionId) {
-        Auction auction = null;
+    public AuctionDTO getAuctionById(int auctionId) {
+        AuctionDTO auction = null;
 
         String sql = "SELECT * FROM auction WHERE auction_id = ?";
 
@@ -23,7 +24,7 @@ public class AuctionDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    auction = new Auction();
+                    auction = new AuctionDTO();
 
                     auction.setAuctionId(rs.getInt("auction_id"));
                     auction.setProductId(rs.getInt("product_id"));
@@ -50,8 +51,8 @@ public class AuctionDAO {
         return auction;
     }
 
-    public Auction getAuctionByProductId(int productId) {
-        Auction auction = null;
+    public AuctionDTO getAuctionByProductId(int productId) {
+        AuctionDTO auction = null;
 
         String sql = "SELECT * FROM auction WHERE product_id = ?";
 
@@ -63,7 +64,7 @@ public class AuctionDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    auction = new Auction();
+                    auction = new AuctionDTO();
 
                     auction.setAuctionId(rs.getInt("auction_id"));
                     auction.setProductId(rs.getInt("product_id"));
