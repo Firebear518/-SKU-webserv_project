@@ -2,7 +2,7 @@
     <wb-module deploy-name="webserv_project">
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <property name="context-root" value="webserv_project2"/>
+        <property name="context-root" value="webserv_project"/>
         <property name="java-output-path" value="/webserv_project/build/classes"/>
     </wb-module>
 </project-modules>
