@@ -63,11 +63,11 @@ CREATE TABLE auction (
 --  5. 입찰 테이블
 -- ─────────────────────────────────────────
 CREATE TABLE bid (
-    bid_id     INT      PRIMARY KEY AUTO_INCREMENT,
-    auction_id INT      NOT NULL,
-    user_id    INT,
-    bid_price  INT      NOT NULL,
-    bid_time   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    bid_id     INT         PRIMARY KEY AUTO_INCREMENT,
+    auction_id INT         NOT NULL,
+    user_id    VARCHAR(50),
+    bid_price  INT         NOT NULL,
+    bid_time   DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (auction_id) REFERENCES auction(auction_id)
 );
 
@@ -122,10 +122,10 @@ INSERT INTO products (title, description, price, image_path, seller_id, category
 --  경매 (각 상품 1:1 매핑)
 -- ─────────────────────────────────────────
 INSERT INTO auction (product_id, start_price, current_price, highest_bidder_id, start_time, end_time, auction_status) VALUES
-(1,  50000,   85000,  2, NOW(), DATE_ADD(NOW(), INTERVAL 4  DAY), 'ONGOING'),
-(2, 300000,  420000,  1, NOW(), DATE_ADD(NOW(), INTERVAL 2  DAY), 'ONGOING'),
-(3, 1000000, 1250000, 2, NOW(), DATE_ADD(NOW(), INTERVAL 7  DAY), 'ONGOING'),
-(4,  80000,   80000,  NULL, NOW(), DATE_ADD(NOW(), INTERVAL 1  DAY), 'ONGOING');
+(1,  50000,   85000,  'user2', NOW(), DATE_ADD(NOW(), INTERVAL 4  DAY), 'ONGOING'),
+(2, 300000,  420000,  'user1', NOW(), DATE_ADD(NOW(), INTERVAL 2  DAY), 'ONGOING'),
+(3, 1000000, 1250000, 'user2', NOW(), DATE_ADD(NOW(), INTERVAL 7  DAY), 'ONGOING'),
+(4,  80000,   80000,  NULL,    NOW(), DATE_ADD(NOW(), INTERVAL 1  DAY), 'ONGOING');
 
 -- ─────────────────────────────────────────
 --  입찰 내역
