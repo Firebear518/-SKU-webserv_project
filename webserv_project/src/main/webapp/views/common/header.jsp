@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/views/board/productList.jsp">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/board/list.do">
                         <i class="bi bi-list-ul"></i> 카드 경매장
                     </a>
                 </li>

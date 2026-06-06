@@ -30,14 +30,14 @@ public class AiRecommendServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         Properties props = new Properties();
-        // 💡 WEB-INF 폴더 안에서 파일을 직접 정확하게 찝어서 가져옵니다.
+
         try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/config.properties")) {
             if (is != null) {
                 props.load(is);
                 this.geminiApiKey = props.getProperty("gemini.api.key");
                 if (this.geminiApiKey != null) {
                     this.geminiApiKey = this.geminiApiKey.trim();
-                    this.geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + this.geminiApiKey;
+                    this.geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + this.geminiApiKey;
                 }
             } else {
                 System.err.println("⚠️ /WEB-INF/config.properties 파일을 찾을 수 없습니다.");
@@ -52,7 +52,7 @@ public class AiRecommendServlet extends HttpServlet {
         
         String productName = request.getParameter("productName");
         
-        // 💡 [2차 방어] 이름이 아예 없거나 공백(스페이스바만 입력)인 경우 구글 API를 절대 호출하지 않음
+        // 이름이 아예 없거나 공백(스페이스바만 입력)인 경우 구글 API를 호출하지 않음
         if (productName == null || productName.trim().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400 에러 반환
             response.setContentType("text/plain; charset=UTF-8");
@@ -108,6 +108,7 @@ public class AiRecommendServlet extends HttpServlet {
             }
 
             int responseCode = conn.getResponseCode();
+            response.setContentType("text/plain; charset=UTF-8");
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                     StringBuilder responseBuilder = new StringBuilder();
@@ -127,6 +128,12 @@ public class AiRecommendServlet extends HttpServlet {
                     response.getWriter().write(aiResultText);
                 }
             } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder errBuilder = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) errBuilder.append(line);
+                    System.err.println("Gemini API 오류 응답: " + errBuilder);
+                }
                 response.getWriter().write("AI 통신 실패 (에러 코드: " + responseCode + ")");
             }
 
