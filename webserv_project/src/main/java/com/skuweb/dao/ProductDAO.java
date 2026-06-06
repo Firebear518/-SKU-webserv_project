@@ -1,8 +1,12 @@
+package com.skuweb.dao;
 
+ 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.skuweb.dao.dto.ProductDTO;
+ 
 public class ProductDAO {
     // DB 연결 정보 (본인의 DB ID/PW/URL로 변경하세요)
     private String url = "jdbc:mysql://localhost:3306/auction_db?useSSL=false&serverTimezone=UTC";

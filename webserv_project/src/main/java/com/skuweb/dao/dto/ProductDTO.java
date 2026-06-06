@@ -1,3 +1,5 @@
+package com.skuweb.dao.dto;
+
 
 public class ProductDTO {
 
