@@ -14,7 +14,7 @@ USE sku_webserv_db;
 -- ─────────────────────────────────────────
 --  1. 회원 테이블
 -- ─────────────────────────────────────────
-CREATE TABLE users (
+CREATE TABLE users ( 
     user_id   VARCHAR(50)  PRIMARY KEY,
     password  VARCHAR(100) NOT NULL,
     email     VARCHAR(100),
@@ -52,7 +52,7 @@ CREATE TABLE auction (
     product_id        INT         NOT NULL,
     start_price       INT         NOT NULL,
     current_price     INT         NOT NULL,
-    highest_bidder_id INT,
+    highest_bidder_id VARCHAR(50),
     start_time        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     end_time          DATETIME    NOT NULL,
     auction_status    VARCHAR(20) NOT NULL DEFAULT 'ONGOING',
