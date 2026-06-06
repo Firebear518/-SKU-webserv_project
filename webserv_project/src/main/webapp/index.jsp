@@ -1,12 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ page import="dao.ProductDAO, dto.Product, java.util.List" %>
-<%
-    ProductDAO productDAO = new ProductDAO();
-    List<Product> productList = productDAO.getLatestProducts(4);
-    request.setAttribute("productList", productList);
-%>
+<%@ page contentType="text/html; charset=utf-8" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,41 +12,77 @@
 
     <div class="container my-5">
         <h3 class="fw-bold text-dark mb-4"><i class="bi bi-gavel text-warning"></i> 현재 진행 중인 실시간 경매</h3>
-
+        
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-            <c:forEach var="p" items="${productList}">
-                <div class="col">
-                    <a href="${pageContext.request.contextPath}/product/detail?productId=${p.productId}" class="text-decoration-none text-dark">
-                        <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-                            <c:choose>
-                                <c:when test="${not empty p.imagePath}">
-                                    <img src="${pageContext.request.contextPath}${p.imagePath}"
-                                         class="card-img-top" style="height:200px; object-fit:cover;" alt="${p.title}">
-                                </c:when>
-                                <c:otherwise>
-                                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height:200px;">
-                                        <i class="bi bi-card-image fs-1"></i>
-                                    </div>
-                                </c:otherwise>
-                            </c:choose>
-                            <div class="card-body">
-                                <c:choose>
-                                    <c:when test="${p.categoryName eq 'POKEMON'}"><span class="badge bg-primary mb-2">포켓몬</span></c:when>
-                                    <c:when test="${p.categoryName eq 'YUGIOH'}"><span class="badge bg-success mb-2">유희왕</span></c:when>
-                                    <c:when test="${p.categoryName eq 'SPORTS'}"><span class="badge bg-dark mb-2">스포츠</span></c:when>
-                                    <c:otherwise><span class="badge bg-secondary mb-2">기타</span></c:otherwise>
-                                </c:choose>
-                                <h5 class="card-title fw-bold text-truncate mb-1">${p.title}</h5>
-                                <p class="text-danger small fw-bold mb-2"><i class="bi bi-clock"></i> 마감: ${p.endTime}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <span class="text-muted small">시작가 <fmt:formatNumber value="${p.price}" pattern="#,###"/>원</span>
-                                    <span class="fw-bold text-dark fs-5">현재가 <fmt:formatNumber value="${p.currentPrice}" pattern="#,###"/>원</span>
-                                </div>
-                            </div>
+            
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-card-image fs-1"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">포켓몬</span>
+                        <h5 class="card-title fw-bold text-truncate mb-1">[포켓몬] 리자몽 VMAX SSR</h5>
+                        <p class="text-danger small fw-bold mb-2"><i class="bi bi-clock"></i> 남은 시간: 02:15:43</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">시작가 50,000원</span>
+                            <span class="fw-bold text-dark fs-5">현재가 65,000원</span>
                         </div>
-                    </a>
+                    </div>
                 </div>
-            </c:forEach>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-card-image fs-1"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-success mb-2">유희왕</span>
+                        <h5 class="card-title fw-bold text-truncate mb-1">[유희왕] 푸른 눈의 백룡 (홀로그래픽 래어)</h5>
+                        <p class="text-danger small fw-bold mb-2"><i class="bi bi-clock"></i> 남은 시간: 11:04:12</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">시작가 120,000원</span>
+                            <span class="fw-bold text-dark fs-5">현재가 120,000원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-card-image fs-1"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">포켓몬</span>
+                        <h5 class="card-title fw-bold text-truncate mb-1">[포켓몬] 피카츄 25주년 프로모</h5>
+                        <p class="text-danger small fw-bold mb-2"><i class="bi bi-clock"></i> 남은 시간: 00:32:19</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">시작가 10,000원</span>
+                            <span class="fw-bold text-dark fs-5">현재가 23,000원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-card-image fs-1"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-dark mb-2">스포츠</span>
+                        <h5 class="card-title fw-bold text-truncate mb-1">오타니 쇼헤이 2024 로드 투 홈런 카드</h5>
+                        <p class="text-danger small fw-bold mb-2"><i class="bi bi-clock"></i> 남은 시간: 05:41:00</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-muted small">시작가 35,000원</span>
+                            <span class="fw-bold text-dark fs-5">현재가 42,000원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

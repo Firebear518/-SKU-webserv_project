@@ -24,9 +24,12 @@
                                 <label class="form-label fw-semibold text-muted">접근 계정</label>
                                 <input type="text" class="form-control bg-white" value="${sessionScope.userId}" readonly disabled>
                             </div>
-                            
+                            <% if ("invalid".equals(request.getParameter("error"))) { %>
+<div class="alert alert-danger small py-2">비밀번호가 일치하지 않습니다.</div>
+<% } %>
                             <div class="mb-4">
                                 <label for="password" class="form-label fw-semibold">비밀번호 확인</label>
+                                
                                 <input type="password" class="form-control" id="password" name="password" placeholder="현재 비밀번호를 입력하세요" required>
                             </div>
                             

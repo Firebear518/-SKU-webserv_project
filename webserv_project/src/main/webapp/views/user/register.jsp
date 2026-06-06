@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>올댓카드 - 회원가입</title>
+ 
     <style>
         .privacy-box {
             max-height: 120px;
@@ -90,8 +91,9 @@
                             </div>
                             
                             <button type="submit" class="btn btn-dark w-100 fw-bold py-2 shadow-sm mb-3">
-                                동의하고 가입하기
+  								동의하고 가입하기
                             </button>
+                            
                             
                             <hr class="text-muted">
                             
