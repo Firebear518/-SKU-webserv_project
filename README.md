@@ -1,2 +1,0 @@
-# webserv_project2
-
