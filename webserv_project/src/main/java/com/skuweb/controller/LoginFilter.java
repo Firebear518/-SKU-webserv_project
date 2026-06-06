@@ -1,5 +1,7 @@
 
 
+package com.skuweb.controller;
+
 import java.io.IOException;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -19,7 +21,7 @@ public class LoginFilter implements Filter {
 	    if (uri.contains("admin.jsp")) {
 	        String role = (session != null) ? (String) session.getAttribute("role") : null;
 	        if (!"admin".equals(role)) {
-	            res.sendRedirect("index.jsp");
+	            res.sendRedirect(req.getContextPath() + "/index.jsp");
 	            return; // 리다이렉트 후 반드시 종료
 	        }
 	        chain.doFilter(request, response); // 관리자면 통과
@@ -27,8 +29,11 @@ public class LoginFilter implements Filter {
 	    }
 
 	    // 2. 로그인 예외 페이지 체크
-	    boolean isLoginPage = uri.endsWith("login.jsp") || uri.endsWith("register.jsp") 
-	                       || uri.endsWith("LoginServlet") || uri.endsWith("RegisterServlet");
+	    boolean isLoginPage = uri.endsWith("login.jsp") || uri.endsWith("register.jsp")
+	                       || uri.endsWith("LoginServlet") || uri.endsWith("RegisterServlet")
+	                       || uri.contains("/resources/")
+	                       || uri.contains("/uploads/")
+	                       || uri.contains("/test/");
 
 	 // 기존 33번 줄 부분을 아래 코드로 완전히 교체해 보세요.
 	 // 3. 로그인 상태 체크
@@ -37,7 +42,7 @@ public class LoginFilter implements Filter {
 	 } else if (session != null && session.getAttribute("userId") != null) {
 	     chain.doFilter(request, response);
 	 } else {
-	     res.sendRedirect("login.jsp");
+	     res.sendRedirect(req.getContextPath() + "/views/user/login.jsp");
 	 }
 	}
 }
