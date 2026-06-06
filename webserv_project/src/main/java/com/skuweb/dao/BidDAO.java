@@ -20,7 +20,7 @@ public class BidDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setInt(1, bid.getAuctionId());
-            pstmt.setInt(2, bid.getUserId());
+            pstmt.setString(2, bid.getUserId());
             pstmt.setInt(3, bid.getBidPrice());
 
             int result = pstmt.executeUpdate();
@@ -34,7 +34,7 @@ public class BidDAO {
         return false;
     }
 
-    public BidResultDTO placeBid(int auctionId, int userId, int bidPrice) {
+    public BidResultDTO placeBid(int auctionId, String userId, int bidPrice) {
         AuctionDAO auctionDAO = new AuctionDAO();
 
         AuctionDTO auction = auctionDAO.getAuctionById(auctionId);

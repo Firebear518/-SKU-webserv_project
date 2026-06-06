@@ -3,7 +3,7 @@ package com.skuweb.dao.dto;
 public class BidDTO {
     private int bidId;
     private int auctionId;
-    private int userId;
+    private String userId;
     private int bidPrice;
     private String bidTime;
 
@@ -23,11 +23,11 @@ public class BidDTO {
         this.auctionId = auctionId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

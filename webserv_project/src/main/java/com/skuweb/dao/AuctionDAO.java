@@ -90,7 +90,7 @@ public class AuctionDAO {
         return auction;
     }
 
-    public boolean updateCurrentPriceAndBidder(int auctionId, int bidPrice, int userId) {
+    public boolean updateCurrentPriceAndBidder(int auctionId, int bidPrice, String userId) {
         String sql = "UPDATE auction SET current_price = ?, highest_bidder_id = ? WHERE auction_id = ?";
 
         try (
@@ -98,7 +98,7 @@ public class AuctionDAO {
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setInt(1, bidPrice);
-            pstmt.setInt(2, userId);
+            pstmt.setString(2, userId);
             pstmt.setInt(3, auctionId);
 
             int result = pstmt.executeUpdate();

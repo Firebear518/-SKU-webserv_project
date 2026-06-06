@@ -41,7 +41,7 @@ public class BidServlet extends HttpServlet {
         	    return;
         	}
 
-        	int userId = (int) session.getAttribute("userId");
+        	String userId = (String) session.getAttribute("userId");
 
             BidDAO bidDAO = new BidDAO();
             BidResultDTO result = bidDAO.placeBid(auctionId, userId, bidPrice);
