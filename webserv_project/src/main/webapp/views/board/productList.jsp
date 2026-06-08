@@ -57,6 +57,13 @@
             color: #dc3545;
             font-weight: 800;
         }
+        .sold-card {
+        	border: 3px solid #198754 !important;
+        }
+        .failed-card {
+        	opacity: 0.6;
+        	filter: grayscale(80%);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -112,7 +119,17 @@
                 </c:choose>
 
                 <div class="col product-item" data-category="${fn:escapeXml(p.categoryName)}">
-                    <div class="card product-card h-100 shadow-sm"
+                    <c:set var="cardClass" value="" />
+					<c:choose>
+					    <c:when test="${p.auctionStatus == 'SOLD'}">
+					        <c:set var="cardClass" value="sold-card"/>
+					    </c:when>
+					
+					    <c:when test="${p.auctionStatus == 'FAILED'}">
+					        <c:set var="cardClass" value="failed-card"/>
+					    </c:when>
+					</c:choose>
+                    <div class="card product-card h-100 shadow-sm ${cardClass}"
                          onclick="location.href='${pageContext.request.contextPath}/product/detail?productId=${p.productId}'"
                          style="cursor:pointer;">
                         <div class="card-img-wrapper">
@@ -129,7 +146,23 @@
                         </div>
                         <div class="card-body d-flex flex-column justify-content-between p-3">
                             <div>
+                            	<c:choose>
+                                	<c:when test="${p.auctionStatus == 'SOLD'}">
+                                		<c:set var="statusClass" value="bg-success"/>
+                                		<c:set var="statusLabel" value="낙찰"/>
+                                	</c:when>
+                                	<c:when test="${p.auctionStatus == 'FAILED'}">
+								        <c:set var="statusClass" value="bg-dark"/>
+								        <c:set var="statusLabel" value="유찰"/>
+								    </c:when>
+								
+								    <c:otherwise>
+								        <c:set var="statusClass" value="bg-primary"/>
+								        <c:set var="statusLabel" value="진행중"/>
+								    </c:otherwise>
+                                </c:choose>
                                 <span class="badge ${badgeClass} mb-2" style="font-size: 0.7rem;">${categoryLabel}</span>
+                                <span class="badge ${statusClass} mb-2" style="font-size: 0.7rem;">${statusLabel}</span>
                                 <h6 class="card-title fw-bold text-dark text-truncate mb-1">${fn:escapeXml(p.title)}</h6>
                                 <p class="text-muted mb-2" style="font-size: 0.8rem;">출품자: ${fn:escapeXml(p.sellerId)}</p>
                             </div>

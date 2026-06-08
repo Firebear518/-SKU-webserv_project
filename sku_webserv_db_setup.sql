@@ -71,6 +71,19 @@ CREATE TABLE bid (
     FOREIGN KEY (auction_id) REFERENCES auction(auction_id)
 );
 
+-- ─────────────────────────────────────────
+--  6. 댓글 테이블 (판매자-구매자 소통용)
+-- ─────────────────────────────────────────
+CREATE TABLE comments (
+    comment_id  INT          PRIMARY KEY AUTO_INCREMENT,
+    product_id  INT          NOT NULL,
+    user_id     VARCHAR(50),
+    content     TEXT         NOT NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (user_id)    REFERENCES users(user_id)
+);
+
 -- ============================================================
 --  테스트 데이터
 -- ============================================================

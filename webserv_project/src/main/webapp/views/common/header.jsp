@@ -50,6 +50,11 @@
                         </span>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link text-warning fw-semibold" href="${pageContext.request.contextPath}/user/myPage">
+                            <i class="bi bi-box-seam"></i> 내 상품 관리
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-white-50" href="${pageContext.request.contextPath}/views/user/myPageConfirm.jsp">
                             <i class="bi bi-person-gear"></i> 내 정보 관리
                         </a>

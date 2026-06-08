@@ -1,9 +1,13 @@
 package com.skuweb.controller;
 
+import com.skuweb.dao.AuctionDAO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 
 import com.skuweb.dao.BidDAO;
+import com.skuweb.dao.dto.AuctionDTO;
 import com.skuweb.dao.dto.BidResultDTO;
 
 import jakarta.servlet.ServletException;
@@ -38,6 +42,29 @@ public class BidServlet extends HttpServlet {
 
         	if (session == null || session.getAttribute("userId") == null) {
         	    out.print("{\"success\":false,\"message\":\"로그인이 필요합니다.\",\"currentPrice\":0}");
+        	    return;
+        	}
+        	
+        	AuctionDAO auctionDAO = new AuctionDAO();
+        	AuctionDTO auction = auctionDAO.getAuctionById(auctionId);
+        	
+        	if (auction == null) {
+        		out.print("{\"success\":false,\"message\":\"존재하지 않는 경매입니다.\"}");
+        	    return;
+        	}
+        	
+        	if (!"ONGOING".equals(auction.getAuctionStatus())) {
+        		out.print("{\"success\":false,\"message\":\"이미 종료된 경매입니다.\"}");
+        		return;
+        	}
+        	
+        	LocalDateTime endTime = 
+        		LocalDateTime.parse(
+        			auction.getEndTime().replace(" ", "T")
+        		);
+        	
+        	if (LocalDateTime.now().isAfter(endTime)) {
+        		out.print("{\"success\":false,\"message\":\"경매가 종료되었습니다.\"}");
         	    return;
         	}
 
