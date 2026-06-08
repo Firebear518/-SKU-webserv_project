@@ -2,8 +2,12 @@ package servlet;
 
 import java.io.IOException;
 
+import java.util.List;
+
 import com.skuweb.dao.AuctionDAO;
+import com.skuweb.dao.CommentDAO;
 import com.skuweb.dao.dto.AuctionDTO;
+import com.skuweb.dao.dto.CommentDTO;
 import dao.ProductDAO;
 import dto.Product;
 import jakarta.servlet.ServletException;
@@ -23,12 +27,15 @@ public class ProductDetailServlet extends HttpServlet {
 
         ProductDAO productDAO = new ProductDAO();
         AuctionDAO auctionDAO = new AuctionDAO();
+        CommentDAO commentDAO = new CommentDAO();
 
         Product product    = productDAO.getProduct(productId);
         AuctionDTO auction = auctionDAO.getAuctionByProductId(productId);
+        List<CommentDTO> comments = commentDAO.getCommentsByProductId(productId);
 
         req.setAttribute("product", product);
         req.setAttribute("auction", auction);
+        req.setAttribute("comments", comments);
 
         req.getRequestDispatcher("/views/board/productDetail.jsp").forward(req, resp);
     }

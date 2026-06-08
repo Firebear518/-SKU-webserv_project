@@ -44,7 +44,7 @@ public class AuctionStatusServlet extends HttpServlet {
             if (auction.getHighestBidderId() == null) {
                 out.print("\"highestBidderId\":null,");
             } else {
-                out.print("\"highestBidderId\":" + auction.getHighestBidderId() + ",");
+                out.print("\"highestBidderId\":\"" + auction.getHighestBidderId() + "\",");
             }
 
             out.print("\"auctionStatus\":\"" + auction.getAuctionStatus() + "\",");

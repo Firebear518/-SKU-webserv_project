@@ -32,12 +32,7 @@ public class AuctionDAO {
                     auction.setStartPrice(rs.getInt("start_price"));
                     auction.setCurrentPrice(rs.getInt("current_price"));
 
-                    int highestBidderId1 = rs.getInt("highest_bidder_id");
-                    if (rs.wasNull()) {
-                        auction.setHighestBidderId(null);
-                    } else {
-                        auction.setHighestBidderId(highestBidderId1);
-                    }
+                    auction.setHighestBidderId(rs.getString("highest_bidder_id"));
                     auction.setStartTime(rs.getString("start_time"));
                     auction.setEndTime(rs.getString("end_time"));
                     auction.setAuctionStatus(rs.getString("auction_status"));
@@ -71,12 +66,7 @@ public class AuctionDAO {
                     auction.setStartPrice(rs.getInt("start_price"));
                     auction.setCurrentPrice(rs.getInt("current_price"));
 
-                    int highestBidderId2 = rs.getInt("highest_bidder_id");
-                    if (rs.wasNull()) {
-                        auction.setHighestBidderId(null);
-                    } else {
-                        auction.setHighestBidderId(highestBidderId2);
-                    }
+                    auction.setHighestBidderId(rs.getString("highest_bidder_id"));
                     auction.setStartTime(rs.getString("start_time"));
                     auction.setEndTime(rs.getString("end_time"));
                     auction.setAuctionStatus(rs.getString("auction_status"));
