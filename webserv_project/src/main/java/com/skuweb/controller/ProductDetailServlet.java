@@ -1,4 +1,4 @@
-package servlet;
+package com.skuweb.controller;
 
 import java.io.IOException;
 
@@ -8,8 +8,8 @@ import com.skuweb.dao.AuctionDAO;
 import com.skuweb.dao.CommentDAO;
 import com.skuweb.dao.dto.AuctionDTO;
 import com.skuweb.dao.dto.CommentDTO;
-import dao.ProductDAO;
-import dto.Product;
+import com.skuweb.dao.ProductDAO;
+import com.skuweb.dao.dto.ProductDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,7 +29,7 @@ public class ProductDetailServlet extends HttpServlet {
         AuctionDAO auctionDAO = new AuctionDAO();
         CommentDAO commentDAO = new CommentDAO();
 
-        Product product    = productDAO.getProduct(productId);
+        ProductDTO product = productDAO.getProduct(productId);
         AuctionDTO auction = auctionDAO.getAuctionByProductId(productId);
         List<CommentDTO> comments = commentDAO.getCommentsByProductId(productId);
 

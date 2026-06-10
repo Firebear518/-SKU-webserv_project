@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.skuweb.dao.AuctionDAO;
-import dao.ProductDAO;
-import dto.Product;
+import com.skuweb.dao.ProductDAO;
+import com.skuweb.dao.dto.ProductDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -82,7 +82,7 @@ public class ProductRegisterServlet extends HttpServlet {
             int categoryId = productDAO.getCategoryIdByName(category);
 
             // 5. Product 객체 생성 후 DB 등록
-            Product product = new Product();
+            ProductDTO product = new ProductDTO();
             product.setTitle(productName);
             product.setDescription(description);
             product.setPrice(Integer.parseInt(startPrice));

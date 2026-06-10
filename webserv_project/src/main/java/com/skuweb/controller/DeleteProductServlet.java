@@ -2,7 +2,7 @@ package com.skuweb.controller;
 
 import java.io.IOException;
 
-import dao.ProductDAO;
+import com.skuweb.dao.ProductDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

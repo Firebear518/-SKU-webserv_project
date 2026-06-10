@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ page import="dao.ProductDAO, dto.Product, java.util.List" %>
+<%@ page import="com.skuweb.dao.ProductDAO, com.skuweb.dao.dto.ProductDTO, java.util.List" %>
 <%
     ProductDAO productDAO = new ProductDAO();
-    List<Product> productList = productDAO.getLatestProducts(4);
+    List<ProductDTO> productList = productDAO.getLatestProducts(4);
     request.setAttribute("productList", productList);
 %>
 <!DOCTYPE html>
