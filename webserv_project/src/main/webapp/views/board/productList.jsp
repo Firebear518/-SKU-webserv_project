@@ -66,6 +66,13 @@
             color: #dc3545;
             font-weight: 800;
         }
+        .sold-card {
+        	border: 3px solid #198754 !important;
+        }
+        .failed-card {
+        	opacity: 0.6;
+        	filter: grayscale(80%);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -96,23 +103,77 @@
         </div>
 
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="productGridContainer">
-            
-            <div class="col product-item" data-category="POKEMON">
-                <div class="card product-card h-100 shadow-sm" onclick="location.href='${pageContext.request.contextPath}/views/board/productDetail.jsp'">
-                    <div class="card-img-wrapper">
-                        <span class="time-badge"><i class="bi bi-clock-fill"></i> 04일 남음</span>
-                        <img src="https://images.pokemontcg.io/sv6/193_hires.png" alt="카드 이미지">
-                    </div>
-                    <div class="card-body d-flex flex-column justify-content-between p-3">
-                        <div>
-                            <span class="badge bg-primary mb-2" style="font-size: 0.7rem;">포켓몬 카드</span>
-                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">메가개굴닌자ex SAR</h6>
-                            <p class="text-muted extra-small mb-2" style="font-size: 0.8rem;">출품자: pokemon_master</p>
+
+            <c:forEach var="p" items="${productList}">
+                <%-- 카테고리 뱃지 색상 결정 --%>
+                <c:set var="badgeClass" value="bg-secondary" />
+                <c:set var="categoryLabel" value="${fn:escapeXml(p.categoryName)}" />
+                <c:choose>
+                    <c:when test="${p.categoryName == 'POKEMON'}">
+                        <c:set var="badgeClass" value="bg-primary" />
+                        <c:set var="categoryLabel" value="포켓몬 카드" />
+                    </c:when>
+                    <c:when test="${p.categoryName == 'YUGIOH'}">
+                        <c:set var="badgeClass" value="bg-danger" />
+                        <c:set var="categoryLabel" value="유희왕" />
+                    </c:when>
+                    <c:when test="${p.categoryName == 'SPORTS'}">
+                        <c:set var="badgeClass" value="bg-success" />
+                        <c:set var="categoryLabel" value="스포츠 카드" />
+                    </c:when>
+                    <c:otherwise>
+                        <c:set var="badgeClass" value="bg-secondary" />
+                        <c:set var="categoryLabel" value="기타" />
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="col product-item" data-category="${fn:escapeXml(p.categoryName)}">
+                    <c:set var="cardClass" value="" />
+					<c:choose>
+					    <c:when test="${p.auctionStatus == 'SOLD'}">
+					        <c:set var="cardClass" value="sold-card"/>
+					    </c:when>
+					
+					    <c:when test="${p.auctionStatus == 'FAILED'}">
+					        <c:set var="cardClass" value="failed-card"/>
+					    </c:when>
+					</c:choose>
+                    <div class="card product-card h-100 shadow-sm ${cardClass}"
+                         onclick="location.href='${pageContext.request.contextPath}/product/detail?productId=${p.productId}'"
+                         style="cursor:pointer;">
+                        <div class="card-img-wrapper">
+                            <span class="time-badge">
+                                <i class="bi bi-clock-fill"></i>
+                                <c:choose>
+                                    <c:when test="${not empty p.endTime}">${fn:substring(p.endTime, 0, 10)} 마감</c:when>
+                                    <c:otherwise>경매 중</c:otherwise>
+                                </c:choose>
+                            </span>
+                            <img src="${pageContext.request.contextPath}${fn:escapeXml(p.imagePath)}"
+                                 alt="카드 이미지"
+                                 onerror="this.src='https://via.placeholder.com/200x280?text=No+Image'">
                         </div>
-                        <div class="border-top pt-2 mt-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-secondary">현재 최고가</span>
-                                <span class="fs-5 price-text">₩ 85,000</span>
+                        <div class="card-body d-flex flex-column justify-content-between p-3">
+                            <div>
+                            	<c:choose>
+                                	<c:when test="${p.auctionStatus == 'SOLD'}">
+                                		<c:set var="statusClass" value="bg-success"/>
+                                		<c:set var="statusLabel" value="낙찰"/>
+                                	</c:when>
+                                	<c:when test="${p.auctionStatus == 'FAILED'}">
+								        <c:set var="statusClass" value="bg-dark"/>
+								        <c:set var="statusLabel" value="유찰"/>
+								    </c:when>
+								
+								    <c:otherwise>
+								        <c:set var="statusClass" value="bg-primary"/>
+								        <c:set var="statusLabel" value="진행중"/>
+								    </c:otherwise>
+                                </c:choose>
+                                <span class="badge ${badgeClass} mb-2" style="font-size: 0.7rem;">${categoryLabel}</span>
+                                <span class="badge ${statusClass} mb-2" style="font-size: 0.7rem;">${statusLabel}</span>
+                                <h6 class="card-title fw-bold text-dark text-truncate mb-1">${fn:escapeXml(p.title)}</h6>
+                                <p class="text-muted mb-2" style="font-size: 0.8rem;">출품자: ${fn:escapeXml(p.sellerId)}</p>
                             </div>
                         </div>
                     </div>

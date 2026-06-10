@@ -132,8 +132,14 @@
                         <span class="fs-3 fw-bold" id="currentHighestPrice">₩ 85,000</span>
                     </div>
                     <div class="d-flex justify-content-between small text-secondary mt-2 border-top pt-1">
-                        <span>남은 경매 시간</span>
-                        <span class="text-light">04일 12시간 34분 12초</span>
+                        <span><i class="bi bi-hourglass-split"></i> 경매 마감까지</span>
+                        <span class="text-light fw-bold" id="auctionCountdown"
+                              data-endtime="${not empty auction ? fn:escapeXml(auction.endTime) : ''}">
+                            <c:choose>
+                                <c:when test="${not empty auction}">계산 중...</c:when>
+                                <c:otherwise>미정</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                 </div>
 
@@ -148,9 +154,19 @@
                             <div class="form-text text-danger mt-1">※ 최고가보다 높은 금액만 입찰 신청 가능합니다.</div>
                         </div>
                         <div class="col-sm-4">
-                            <button type="button" id="submitBidBtn" class="btn btn-warning btn-lg w-100 fw-bold h-100 shadow-sm" onclick="submitBidAction()">
-                                <i class="bi bi-wallet2"></i> 입찰 신청
-                            </button>
+                        	<c:choose>
+                        		<c:when test="${auction.auctionStatus == 'ONGOING'}">
+                        			<button type="button" id="submitBidBtn" class="btn btn-warning btn-lg w-100 fw-bold h-100 shadow-sm"
+	                                    	onclick="submitBidAction(${not empty auction ? auction.auctionId : 0}, ${not empty auction ? auction.currentPrice : product.price})">
+		                                <i class="bi bi-wallet2"></i> 입찰 신청
+		                            </button>
+                        		</c:when>
+                        		<c:otherwise>
+                        			<div class="alert alert-secondary">
+                        				경매가 종료되었습니다.
+                        			</div>
+                        		</c:otherwise>
+                        	</c:choose>
                         </div>
                     </div>
                 </div>
@@ -166,35 +182,60 @@
             </p>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white">
-            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-chat-dots-fill text-primary"></i> 회원 문의 및 댓글 (2)</h5>
-            
-            <div class="d-flex gap-3 mb-4">
-                <div class="flex-grow-1">
-                    <textarea id="commentInput" class="form-control" rows="2" placeholder="상품 상태나 질문을 작성해 보세요."></textarea>
-                </div>
-                <button type="button" class="btn btn-primary px-4 fw-bold" onclick="addCommentMock()">등록</button>
-            </div>
+        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white" id="comments">
+            <h5 class="fw-bold text-dark mb-4">
+                <i class="bi bi-chat-dots-fill text-primary"></i> 회원 문의 및 댓글
+                <span class="text-muted small fw-normal">(${fn:length(comments)})</span>
+            </h5>
 
-            <div class="comment-list-box d-flex flex-column gap-3" id="commentListContainer">
-                <div class="border-bottom pb-3">
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="fw-bold small text-dark">collector_A</span>
-                        <span class="text-muted extra-small" style="font-size: 0.8rem;">2026.05.27</span>
-                    </div>
-                    <p class="text-secondary small mb-0">혹시 카드 뒷면 왼쪽 모서리에 아주 미세한 백화 현상이 있는 건가요?</p>
-                </div>
-
-                <div class="bg-light p-3 rounded-3 ms-4 border-start border-warning border-3">
-                    <div class="d-flex justify-content-between mb-1">
-                        <div>
-                            <span class="fw-bold small text-dark">pokemon_master</span>
-                            <span class="seller-badge"><i class="bi bi-person-badge"></i> 판매자</span>
+            <%-- 댓글 작성 폼 (로그인 시에만 노출) --%>
+            <c:choose>
+                <c:when test="${not empty sessionScope.userId}">
+                    <form action="${pageContext.request.contextPath}/product/comment" method="post" class="d-flex gap-3 mb-4">
+                        <input type="hidden" name="productId" value="${product.productId}">
+                        <div class="flex-grow-1">
+                            <textarea name="content" class="form-control" rows="2"
+                                      placeholder="상품 상태나 질문을 작성해 보세요." required></textarea>
                         </div>
-                        <span class="text-muted" style="font-size: 0.8rem;">2026.05.27</span>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">등록</button>
+                    </form>
+                </c:when>
+                <c:otherwise>
+                    <div class="alert alert-light border text-center text-muted mb-4">
+                        댓글을 작성하려면
+                        <a href="${pageContext.request.contextPath}/views/user/login.jsp" class="fw-bold text-decoration-none">로그인</a>이 필요합니다.
                     </div>
-                    <p class="text-secondary small mb-0">실물 카드 뒷면은 흠집 없이 완전히 깨끗한 상태입니다.</p>
-                </div>
+                </c:otherwise>
+            </c:choose>
+
+            <%-- 댓글 목록 --%>
+            <div class="comment-list-box d-flex flex-column gap-3" id="commentListContainer">
+                <c:choose>
+                    <c:when test="${empty comments}">
+                        <p class="text-muted small">아직 등록된 댓글이 없습니다. 첫 문의를 남겨보세요!</p>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach var="cmt" items="${comments}">
+                            <%-- 판매자 댓글이면 노란색 배경으로 강조 --%>
+                            <c:set var="isSeller" value="${cmt.userId == product.sellerId}" />
+                            <div class="border-bottom pb-3 ${isSeller ? 'rounded-2 p-2' : ''}"
+                                 style="${isSeller ? 'background-color:#fff8e1;' : ''}">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>
+                                        <span class="fw-bold small ${isSeller ? 'text-warning' : 'text-primary'}">
+                                            <c:if test="${isSeller}"><i class="bi bi-patch-check-fill"></i> </c:if>${fn:escapeXml(cmt.userId)}
+                                        </span>
+                                        <c:if test="${isSeller}">
+                                            <span class="badge bg-warning text-dark ms-1">판매자</span>
+                                        </c:if>
+                                    </span>
+                                    <span class="text-muted small">${fn:escapeXml(cmt.createdAt)}</span>
+                                </div>
+                                <p class="text-secondary small mb-0" style="white-space: pre-line;">${fn:escapeXml(cmt.content)}</p>
+                            </div>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </div>
@@ -225,7 +266,54 @@
             scale: 1.04
         });
 
-        // 2. 상세 설명 사진 클릭 시 모달창 크게 띄우기 함수
+        // 경매 마감까지 남은 시간 실시간 카운트다운
+        (function initAuctionCountdown() {
+            const el = document.getElementById('auctionCountdown');
+            if (!el) return;
+
+            const raw = el.getAttribute('data-endtime');
+            if (!raw) return; // 경매 정보 없음 → "미정" 유지
+
+            // MySQL DATETIME "2026-06-12 14:30:00" → ISO 형태로 보정 (서버/클라이언트 동일 시간대 가정)
+            const endTime = new Date(raw.replace(' ', 'T')).getTime();
+            if (isNaN(endTime)) { el.textContent = '시간 정보 오류'; return; }
+
+            let timer = null;
+
+            function pad(n) { return String(n).padStart(2, '0'); }
+
+            function tick() {
+                const diff = endTime - Date.now();
+
+                if (diff <= 0) {
+                    el.textContent = '경매 종료';
+                    el.classList.remove('text-light');
+                    el.classList.add('text-danger');
+                    if (timer) clearInterval(timer);
+                    return;
+                }
+
+                const days    = Math.floor(diff / 86400000);
+                const hours   = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+
+                let txt = '';
+                if (days > 0) txt += days + '일 ';
+                txt += pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
+                el.textContent = txt;
+
+                // 마감 1시간 이내면 강조
+                if (diff <= 3600000) {
+                    el.classList.remove('text-light');
+                    el.classList.add('text-warning');
+                }
+            }
+
+            tick();
+            timer = setInterval(tick, 1000);
+        })();
+
         function openZoomModal(src) {
             document.getElementById('modalZoomImg').src = src;
             const myModal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
@@ -282,43 +370,6 @@
         function forceDeletePost() {
             if (confirm("🚨 [경고] 게시글을 강제 즉시 삭제하시겠습니까?")) {
                 location.href = "${pageContext.request.contextPath}/";
-            }
-        }
-
-        // 5. 댓글 모형 추가
-        function addCommentMock() {
-            const txt = document.getElementById('commentInput').value;
-            if(!txt.trim()) return;
-            const container = document.getElementById('commentListContainer');
-            const div = document.createElement('div');
-            div.className = "border-bottom pb-3";
-            div.innerHTML = `<div class="d-flex justify-content-between mb-1"><span class="fw-bold small text-primary">현재_유저</span></div><p class="text-secondary small mb-0">${txt}</p>`;
-            container.prepend(div);
-            document.getElementById('commentInput').value = "";
-        }
-        function submitReportAction() {
-            const reportedUser = "pokemon_master"; 
-            
-            const productId = 1; 
-            
-
-            if (confirm(`해당 판매자(${reportedUser})를 신고하시겠습니까?`)) {
-                const reason = prompt("신고 사유를 입력해주세요 (예: 위조품 의심, 허위 정보 등)");
-                if (!reason || !reason.trim()) return;
-
-                const params = new URLSearchParams();
-                params.append('reportedUserId', reportedUser);
-                params.append('productId', productId);
-                params.append('reportReason', reason);
-
-                fetch('${pageContext.request.contextPath}/report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params.toString()
-                }).then(res => {
-                    if (res.ok) alert('신고가 접수되었습니다.');
-                    else alert('오류가 발생했습니다.');
-                });
             }
         }
     </script>

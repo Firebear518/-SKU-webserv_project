@@ -5,7 +5,7 @@ public class AuctionDTO {
     private int productId;
     private int startPrice;
     private int currentPrice;
-    private Integer highestBidderId;
+    private String highestBidderId;
     private String startTime;
     private String endTime;
     private String auctionStatus;
@@ -42,11 +42,11 @@ public class AuctionDTO {
         this.currentPrice = currentPrice;
     }
 
-    public Integer getHighestBidderId() {
+    public String getHighestBidderId() {
         return highestBidderId;
     }
 
-    public void setHighestBidderId(Integer highestBidderId) {
+    public void setHighestBidderId(String highestBidderId) {
         this.highestBidderId = highestBidderId;
     }
 

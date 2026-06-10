@@ -20,6 +20,7 @@ public class Product {
     private int currentPrice;      // auction.current_price
     private String endTime;        // auction.end_time
     private int auctionId;         // auction.auction_id
+    private String auctionStatus;  // auction.auction_status (ONGOING/SOLD/FAILED)
 
     public Product() {}
 
@@ -55,6 +56,9 @@ public class Product {
 
     public int getAuctionId() { return auctionId; }
     public void setAuctionId(int auctionId) { this.auctionId = auctionId; }
+
+    public String getAuctionStatus() { return auctionStatus; }
+    public void setAuctionStatus(String auctionStatus) { this.auctionStatus = auctionStatus; }
 
     public String getDetailImagePaths() { return detailImagePaths; }
     public void setDetailImagePaths(String detailImagePaths) { this.detailImagePaths = detailImagePaths; }
