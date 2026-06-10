@@ -3,8 +3,8 @@ package com.skuweb.controller;
 import java.io.IOException;
 import java.util.List;
 
-import dao.ProductDAO;
-import dto.Product;
+import com.skuweb.dao.ProductDAO;
+import com.skuweb.dao.dto.ProductDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -31,7 +31,7 @@ public class MyPageServlet extends HttpServlet {
 
         // 현재 세션 user_id == products.seller_id 인 상품 목록 조회
         ProductDAO productDAO = new ProductDAO();
-        List<Product> myProducts = productDAO.getProductsBySeller(userId);
+        List<ProductDTO> myProducts = productDAO.getProductsBySeller(userId);
 
         req.setAttribute("myProducts", myProducts);
         req.getRequestDispatcher("/views/user/myPage.jsp").forward(req, resp);

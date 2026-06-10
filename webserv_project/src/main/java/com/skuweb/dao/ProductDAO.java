@@ -1,4 +1,4 @@
-package dao;
+package com.skuweb.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,14 +6,14 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import dto.Product;
+import com.skuweb.dao.dto.ProductDTO;
 import util.DBUtil;
 
 public class ProductDAO {
 
     // 전체 상품 목록 (categories + auction LEFT JOIN)
-    public List<Product> getAllProducts() {
-        List<Product> list = new ArrayList<>();
+    public List<ProductDTO> getAllProducts() {
+        List<ProductDTO> list = new ArrayList<>();
         String sql =
         	    "SELECT p.product_id, p.title, p.seller_id, p.price, p.image_path, p.category_id, " +
         	    "c.category_name, a.auction_id, a.current_price, a.end_time, a.auction_status " +
@@ -27,7 +27,7 @@ public class ProductDAO {
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                Product p = new Product();
+                ProductDTO p = new ProductDTO();
                 p.setProductId(rs.getInt("product_id"));
                 p.setTitle(rs.getString("title"));
                 p.setSellerId(rs.getString("seller_id"));
@@ -49,8 +49,8 @@ public class ProductDAO {
     }
     
  // 상품명으로 검색
-    public List<Product> searchProductsByTitle(String searchKeyword) {
-        List<Product> list = new ArrayList<>();
+    public List<ProductDTO> searchProductsByTitle(String searchKeyword) {
+        List<ProductDTO> list = new ArrayList<>();
 
         String sql =
             "SELECT p.product_id, p.title, p.seller_id, p.price, p.image_path, p.category_id, " +
@@ -74,7 +74,7 @@ public class ProductDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Product p = new Product();
+                    ProductDTO p = new ProductDTO();
 
                     p.setProductId(rs.getInt("product_id"));
                     p.setTitle(rs.getString("title"));
@@ -103,8 +103,8 @@ public class ProductDAO {
     }
 
     // 최신 N개 상품 (메인 페이지용)
-    public List<Product> getLatestProducts(int limit) {
-        List<Product> list = new ArrayList<>();
+    public List<ProductDTO> getLatestProducts(int limit) {
+        List<ProductDTO> list = new ArrayList<>();
         String sql =
         	    "SELECT p.product_id, p.title, p.seller_id, p.price, p.image_path, p.category_id, " +
         	    "c.category_name, a.auction_id, a.current_price, a.end_time, a.auction_status " +
@@ -118,7 +118,7 @@ public class ProductDAO {
             pstmt.setInt(1, limit);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Product p = new Product();
+                    ProductDTO p = new ProductDTO();
                     p.setProductId(rs.getInt("product_id"));
                     p.setTitle(rs.getString("title"));
                     p.setSellerId(rs.getString("seller_id"));
@@ -141,7 +141,7 @@ public class ProductDAO {
     }
 
     // 상품 단건 조회 (상세 페이지용)
-    public Product getProduct(int productId) {
+    public ProductDTO getProduct(int productId) {
         String sql = "SELECT p.*, c.category_name " +
                      "FROM products p " +
                      "LEFT JOIN categories c ON p.category_id = c.category_id " +
@@ -153,7 +153,7 @@ public class ProductDAO {
             pstmt.setInt(1, productId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Product p = new Product();
+                    ProductDTO p = new ProductDTO();
                     p.setProductId(rs.getInt("product_id"));
                     p.setTitle(rs.getString("title"));
                     p.setDescription(rs.getString("description"));
@@ -173,7 +173,7 @@ public class ProductDAO {
     }
 
     // 상품 등록 → 생성된 product_id 반환 (실패 시 -1)
-    public int insertProduct(Product product) {
+    public int insertProduct(ProductDTO product) {
         String sql = "INSERT INTO products (title, description, price, image_path, seller_id, category_id, detail_image_paths) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -200,8 +200,8 @@ public class ProductDAO {
     }
 
     // 특정 판매자가 등록한 상품 목록 (경매 정보 JOIN)
-    public List<Product> getProductsBySeller(String sellerId) {
-        List<Product> list = new ArrayList<>();
+    public List<ProductDTO> getProductsBySeller(String sellerId) {
+        List<ProductDTO> list = new ArrayList<>();
         String sql = "SELECT p.product_id, p.title, p.seller_id, p.price, p.image_path, p.category_id, " +
                      "c.category_name, a.auction_id, a.current_price, a.end_time, a.auction_status " +
                      "FROM products p " +
@@ -215,7 +215,7 @@ public class ProductDAO {
             pstmt.setString(1, sellerId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Product p = new Product();
+                    ProductDTO p = new ProductDTO();
                     p.setProductId(rs.getInt("product_id"));
                     p.setTitle(rs.getString("title"));
                     p.setSellerId(rs.getString("seller_id"));

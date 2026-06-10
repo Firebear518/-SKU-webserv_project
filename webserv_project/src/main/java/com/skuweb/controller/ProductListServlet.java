@@ -1,10 +1,10 @@
-package servlet;
+package com.skuweb.controller;
 
 import java.io.IOException;
 import java.util.List;
 
-import dao.ProductDAO;
-import dto.Product;
+import com.skuweb.dao.ProductDAO;
+import com.skuweb.dao.dto.ProductDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,7 +27,7 @@ public class ProductListServlet extends HttpServlet {
         }
 
         ProductDAO productDAO = new ProductDAO();
-        List<Product> productList = productDAO.searchProductsByTitle(searchKeyword);
+        List<ProductDTO> productList = productDAO.searchProductsByTitle(searchKeyword);
 
         req.setAttribute("productList", productList);
         req.setAttribute("searchKeyword", searchKeyword);

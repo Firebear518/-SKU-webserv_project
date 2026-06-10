@@ -1,10 +1,10 @@
-package dto;
+package com.skuweb.dao.dto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Product {
+public class ProductDTO {
     // products 테이블 컬럼
     private int productId;
     private String title;
@@ -22,7 +22,7 @@ public class Product {
     private int auctionId;         // auction.auction_id
     private String auctionStatus;  // auction.auction_status (ONGOING/SOLD/FAILED)
 
-    public Product() {}
+    public ProductDTO() {}
 
     public int getProductId() { return productId; }
     public void setProductId(int productId) { this.productId = productId; }
