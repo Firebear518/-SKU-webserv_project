@@ -47,6 +47,60 @@ public class ProductDAO {
         }
         return list;
     }
+    
+ // 상품명으로 검색
+    public List<Product> searchProductsByTitle(String searchKeyword) {
+        List<Product> list = new ArrayList<>();
+
+        String sql =
+            "SELECT p.product_id, p.title, p.seller_id, p.price, p.image_path, p.category_id, " +
+            "       c.category_name, a.auction_id, a.current_price, a.end_time, a.auction_status " +
+            "FROM products p " +
+            "LEFT JOIN categories c ON p.category_id = c.category_id " +
+            "LEFT JOIN auction a ON a.product_id = p.product_id " +
+            "WHERE p.title LIKE CONCAT('%', ?, '%') " +
+            "ORDER BY p.product_id DESC";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            if (searchKeyword == null) {
+                searchKeyword = "";
+            }
+
+            searchKeyword = searchKeyword.trim();
+
+            pstmt.setString(1, searchKeyword);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setProductId(rs.getInt("product_id"));
+                    p.setTitle(rs.getString("title"));
+                    p.setSellerId(rs.getString("seller_id"));
+                    p.setPrice(rs.getInt("price"));
+                    p.setImagePath(rs.getString("image_path"));
+                    p.setCategoryId(rs.getInt("category_id"));
+                    p.setCategoryName(rs.getString("category_name"));
+                    p.setAuctionId(rs.getInt("auction_id"));
+
+                    int currentPrice = rs.getInt("current_price");
+                    p.setCurrentPrice(currentPrice > 0 ? currentPrice : p.getPrice());
+
+                    p.setEndTime(rs.getString("end_time"));
+                    p.setAuctionStatus(rs.getString("auction_status"));
+
+                    list.add(p);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
     // 최신 N개 상품 (메인 페이지용)
     public List<Product> getLatestProducts(int limit) {

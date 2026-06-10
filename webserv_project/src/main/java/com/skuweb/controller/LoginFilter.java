@@ -33,7 +33,10 @@ public class LoginFilter implements Filter {
 	                       || uri.endsWith("LoginServlet") || uri.endsWith("RegisterServlet")
 	                       || uri.contains("/resources/")
 	                       || uri.contains("/uploads/")
-	                       || uri.contains("/test/");
+	                       || uri.contains("/test/")
+						   || uri.endsWith("productList.jsp")
+						   || uri.endsWith("/board/list.do")
+						   || uri.endsWith("poductDetail.jsp");
 
 	 // 기존 33번 줄 부분을 아래 코드로 완전히 교체해 보세요.
 	 // 3. 로그인 상태 체크

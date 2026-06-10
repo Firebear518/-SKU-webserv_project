@@ -18,10 +18,20 @@ public class ProductListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
+
+        String searchKeyword = req.getParameter("searchKeyword");
+
+        if (searchKeyword == null) {
+            searchKeyword = "";
+        }
+
         ProductDAO productDAO = new ProductDAO();
-        List<Product> productList = productDAO.getAllProducts();
+        List<Product> productList = productDAO.searchProductsByTitle(searchKeyword);
 
         req.setAttribute("productList", productList);
+        req.setAttribute("searchKeyword", searchKeyword);
+
         req.getRequestDispatcher("/views/board/productList.jsp").forward(req, resp);
     }
 
