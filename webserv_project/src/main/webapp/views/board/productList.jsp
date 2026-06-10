@@ -78,7 +78,7 @@
                 <form action="${pageContext.request.contextPath}/board/list.do" method="get">
                     <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden bg-white p-1 border">
                         <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search ms-2"></i></span>
-                        <input type="text" name="searchKeyword" class="form-control border-0 bg-transparent fs-6" placeholder="카드 이름, 등급, 세트명 등으로 검색해 보세요...">
+                        <input type="text" name="searchKeyword" class="form-control border-0 bg-transparent fs-6" placeholder="카드 이름으로 검색해 보세요..." value="${fn:escapeXml(searchKeyword)}">
                         <input type="hidden" id="currentCategoryInput" name="category" value="ALL">
                         <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold fs-6 me-1">검색</button>
                     </div>
@@ -133,13 +133,19 @@
                          onclick="location.href='${pageContext.request.contextPath}/product/detail?productId=${p.productId}'"
                          style="cursor:pointer;">
                         <div class="card-img-wrapper">
-                            <span class="time-badge">
-                                <i class="bi bi-clock-fill"></i>
-                                <c:choose>
-                                    <c:when test="${not empty p.endTime}">${fn:substring(p.endTime, 0, 10)} 마감</c:when>
-                                    <c:otherwise>경매 중</c:otherwise>
-                                </c:choose>
-                            </span>
+                            <span class="time-badge countdown-badge"
+							      data-end-time="${fn:escapeXml(p.endTime)}"
+							      data-auction-status="${fn:escapeXml(p.auctionStatus)}">
+							    <i class="bi bi-clock-fill"></i>
+							    <span class="countdown-text">
+							        <c:choose>
+							            <c:when test="${p.auctionStatus == 'SOLD'}">낙찰 완료</c:when>
+							            <c:when test="${p.auctionStatus == 'FAILED'}">유찰</c:when>
+							            <c:when test="${not empty p.endTime}">계산 중...</c:when>
+							            <c:otherwise>경매 중</c:otherwise>
+							        </c:choose>
+							    </span>
+							</span>
                             <img src="${pageContext.request.contextPath}${fn:escapeXml(p.imagePath)}"
                                  alt="카드 이미지"
                                  onerror="this.src='https://via.placeholder.com/200x280?text=No+Image'">
@@ -230,6 +236,71 @@
                 alertBox.classList.add('d-none');
             }
         }
+        
+        function updateAuctionCountdowns() {
+            const badges = document.querySelectorAll('.countdown-badge');
+
+            badges.forEach(badge => {
+                const endTimeText = badge.getAttribute('data-end-time');
+                const auctionStatus = badge.getAttribute('data-auction-status');
+                const textEl = badge.querySelector('.countdown-text');
+
+                if (!textEl) return;
+
+                if (auctionStatus === 'SOLD') {
+                    textEl.textContent = '낙찰 완료';
+                    return;
+                }
+
+                if (auctionStatus === 'FAILED') {
+                    textEl.textContent = '유찰';
+                    return;
+                }
+
+                if (!endTimeText) {
+                    textEl.textContent = '경매 중';
+                    return;
+                }
+
+                const endTime = new Date(endTimeText.replace(' ', 'T'));
+                const now = new Date();
+                const diff = endTime - now;
+
+                if (isNaN(endTime.getTime())) {
+                    textEl.textContent = '시간 오류';
+                    return;
+                }
+
+                if (diff <= 0) {
+                    textEl.textContent = '마감';
+                    badge.style.backgroundColor = 'rgba(108, 117, 125, 0.9)';
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const days = Math.floor(totalSeconds / (60 * 60 * 24));
+                const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+                const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+                const seconds = totalSeconds % 60;
+
+                let timeText = '';
+
+                if (days > 0) {
+                    timeText = days + '일 ' + hours + '시간';
+                } else if (hours > 0) {
+                    timeText = hours + '시간 ' + minutes + '분';
+                } else if (minutes > 0) {
+                    timeText = minutes + '분 ' + seconds + '초';
+                } else {
+                    timeText = seconds + '초';
+                }
+
+                textEl.textContent = timeText + ' 남음';
+            });
+        }
+
+        updateAuctionCountdowns();
+        setInterval(updateAuctionCountdowns, 1000);
     </script>
 </body>
 </html>
