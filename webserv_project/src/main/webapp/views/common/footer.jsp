@@ -10,3 +10,4 @@
 </footer>
 
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/report_helper.js"></script>
