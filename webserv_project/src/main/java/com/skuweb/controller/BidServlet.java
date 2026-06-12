@@ -1,6 +1,8 @@
 package com.skuweb.controller;
 
 import com.skuweb.dao.AuctionDAO;
+import com.skuweb.dao.ProductDAO;
+import com.skuweb.dao.dto.ProductDTO;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -53,6 +55,17 @@ public class BidServlet extends HttpServlet {
         	    return;
         	}
         	
+        	String userId = (String) session.getAttribute("userId");
+
+        	ProductDAO productDAO = new ProductDAO();
+        	ProductDTO product = productDAO.getProduct(auction.getProductId());
+
+        	if (product != null && userId.equals(product.getSellerId())) {
+        	    out.print("{\"success\":false,\"message\":\"본인이 등록한 상품에는 입찰할 수 없습니다.\",\"currentPrice\":" 
+        	              + auction.getCurrentPrice() + "}");
+        	    return;
+        	}
+        	
         	if (!"ONGOING".equals(auction.getAuctionStatus())) {
         		out.print("{\"success\":false,\"message\":\"이미 종료된 경매입니다.\"}");
         		return;
@@ -68,7 +81,6 @@ public class BidServlet extends HttpServlet {
         	    return;
         	}
 
-        	String userId = (String) session.getAttribute("userId");
 
             BidDAO bidDAO = new BidDAO();
             BidResultDTO result = bidDAO.placeBid(auctionId, userId, bidPrice);
