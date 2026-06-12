@@ -185,18 +185,25 @@
                         </div>
                         <div class="col-sm-4">
                         	<c:choose>
-                        		<c:when test="${auction.auctionStatus == 'ONGOING'}">
-                        			<button type="button" id="submitBidBtn" class="btn btn-warning btn-lg w-100 fw-bold h-100 shadow-sm"
-	                                    	onclick="submitBidAction(${not empty auction ? auction.auctionId : 0}, ${not empty auction ? auction.currentPrice : product.price})">
-		                                <i class="bi bi-wallet2"></i> 입찰 신청
-		                            </button>
-                        		</c:when>
-                        		<c:otherwise>
-                        			<div class="alert alert-secondary">
-                        				경매가 종료되었습니다.
-                        			</div>
-                        		</c:otherwise>
-                        	</c:choose>
+							    <c:when test="${sessionScope.userId == product.sellerId}">
+							        <button type="button" class="btn btn-secondary btn-lg w-100 fw-bold h-100" disabled>
+							            본인 상품 입찰 불가
+							        </button>
+							    </c:when>
+							
+							    <c:when test="${auction.auctionStatus == 'ONGOING'}">
+							        <button type="button" id="submitBidBtn" class="btn btn-warning btn-lg w-100 fw-bold h-100 shadow-sm"
+							                onclick="submitBidAction(${not empty auction ? auction.auctionId : 0}, ${not empty auction ? auction.currentPrice : product.price})">
+							            <i class="bi bi-wallet2"></i> 입찰 신청
+							        </button>
+							    </c:when>
+							
+							    <c:otherwise>
+							        <div class="alert alert-secondary">
+							            경매가 종료되었습니다.
+							        </div>
+							    </c:otherwise>
+							</c:choose>
                         </div>
                     </div>
                 </div>
