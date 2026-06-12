@@ -399,6 +399,39 @@
                 location.href = "${pageContext.request.contextPath}/";
             }
         }
+        function startAuctionStatusPolling(auctionId) {
+            if (!auctionId || auctionId <= 0) return;
+
+            setInterval(() => {
+                fetch("${pageContext.request.contextPath}/auctionStatus?auctionId=" + auctionId)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) return;
+
+                        const priceEl = document.getElementById("currentHighestPrice");
+
+                        if (priceEl && data.currentPrice) {
+                            priceEl.innerText = "₩ " + Number(data.currentPrice).toLocaleString();
+                        }
+
+                        if (data.auctionStatus && data.auctionStatus !== "ONGOING") {
+                            const bidBtn = document.getElementById("submitBidBtn");
+
+                            if (bidBtn) {
+                                bidBtn.disabled = true;
+                                bidBtn.innerHTML = "경매 종료";
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.log("경매 상태 갱신 실패", err);
+                    });
+            }, 1000);
+        }
+        
+        <c:if test="${not empty auction}">
+        startAuctionStatusPolling(${auction.auctionId});
+   		</c:if>
     </script>
 </body>
 </html>
