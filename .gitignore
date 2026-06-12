@@ -21,3 +21,6 @@ tmp/
 # 보안 및 API 키 설정 파일
 config.properties
 *.env
+
+# 클로드
+.claude
