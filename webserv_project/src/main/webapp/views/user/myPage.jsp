@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,6 +22,36 @@
                         <h3 class="fw-bold text-dark mb-1"><i class="bi bi-gear-fill text-secondary"></i> 내 정보 관리</h3>
                         <p class="text-muted small mb-4">비밀번호 및 낙찰 시 수령할 배송지 정보를 수정할 수 있습니다.</p>
                         
+                        <!-- 성공 메시지 -->
+                        <c:if test="${param.success == 'true'}">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle"></i> 회원정보가 성공적으로 수정되었습니다!
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        
+                        <!-- 에러 메시지 -->
+                        <c:if test="${param.error == 'empty'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> 모든 필드를 입력해주세요.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        
+                        <c:if test="${param.error == 'passwordMismatch'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> 새 비밀번호가 일치하지 않습니다.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        
+                        <c:if test="${param.error == 'dbError'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle"></i> 데이터베이스 오류가 발생했습니다.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        
                         <form action="${pageContext.request.contextPath}/user/myPageUpdate" method="post" onsubmit="return validateMypageForm()">
                             
                             <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-lock"></i> 비밀번호 변경</h6>
@@ -32,11 +63,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="newPassword" class="form-label fw-semibold">새 비밀번호</label>
-                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="변경할 새 비밀번호">
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="변경할 새 비밀번호" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="newPasswordConfirm" class="form-label fw-semibold">새 비밀번호 확인</label>
-                                    <input type="password" class="form-control" id="newPasswordConfirm" placeholder="한번 더 입력">
+                                    <input type="password" class="form-control" id="newPasswordConfirm" name="newPasswordConfirm" placeholder="한번 더 입력" required>
                                 </div>
                             </div>
                             <div id="passwordError" class="form-text text-danger d-none mb-3">새 비밀번호가 서로 일치하지 않습니다.</div>
@@ -47,15 +78,22 @@
                             
                             <div class="mb-3">
                                 <label for="userPhone" class="form-label fw-semibold">배송 연락처</label>
-                                <input type="tel" class="form-control" id="userPhone" name="userPhone" value="010-1234-5678" required>
+                                <input type="tel" class="form-control" id="userPhone" name="userPhone" 
+                                       value="${not empty user_phone ? user_phone : '010-0000-0000'}" 
+                                       placeholder="010-1234-5678" required>
                             </div>
 
                             <div class="mb-2">
                                 <label for="userAddress" class="form-label fw-semibold">배송지 주소</label>
-                                <input type="text" class="form-control" id="userAddress" name="userAddress" value="서울시 성북구 서경로 124" required>
+                                <input type="text" class="form-control" id="userAddress" name="userAddress" 
+                                       value="${not empty user_address ? user_address : ''}" 
+                                       placeholder="시/도 구/군 도로명" required>
                             </div>
                             <div class="mb-4">
-                                <input type="text" class="form-control" id="userAddressDetail" name="userAddressDetail" value="연구동 3층 소프트웨어학과 학과사무실" required>
+                                <label for="userAddressDetail" class="form-label fw-semibold">상세 주소</label>
+                                <input type="text" class="form-control" id="userAddressDetail" name="userAddressDetail" 
+                                       value="${not empty user_address_detail ? user_address_detail : ''}" 
+                                       placeholder="건물명, 층수, 호수 등" required>
                             </div>
 
                             <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm text-dark">
@@ -95,11 +133,11 @@
                                                 <th>상품</th>
                                                 <th class="text-end">현재가</th>
                                                 <th class="text-center">마감</th>
-                                                <th class="text-center">상태</th>
+ 												<th class="text-center">상태</th>
                                                 <th class="text-center" style="width: 260px;">관리</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody>   
                                         <c:forEach var="p" items="${myProducts}">
                                             <%-- 상태 라벨/뱃지 --%>
                                             <c:set var="statusBadge" value="bg-secondary" />
