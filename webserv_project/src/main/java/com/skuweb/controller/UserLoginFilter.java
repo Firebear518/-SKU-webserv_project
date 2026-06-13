@@ -31,7 +31,7 @@ public class UserLoginFilter implements Filter {
                 uri.equals(ctx + "/admin/login")               ||
                 uri.equals(ctx + "/logout")                    ||
                 uri.equals(ctx + "/register")                  ||
-                uri.equals(ctx + "/user/register")             ||
+           
                 uri.equals(ctx + "/user/checkId")              ||
                 uri.contains("/views/common/")                 ||
                 uri.contains("/css/")                          ||

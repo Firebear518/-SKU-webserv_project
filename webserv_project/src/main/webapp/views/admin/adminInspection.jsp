@@ -102,9 +102,11 @@
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection conn = DBUtil.getConnection();
 
+
         String sql = "SELECT a.auction_id, p.title, p.seller_id, a.highest_bidder_id, a.current_price, IFNULL(a.status, '입고대기') AS status, a.reject_reason " +
                 "FROM auction a JOIN products p ON a.product_id = p.product_id " +
                 "WHERE a.auction_status = 'SOLD'";
+
 
         if ("대기중".equals(filter)) sql += " AND a.status = '입고대기'";
         else if ("검수중".equals(filter)) sql += " AND a.status = '검수중'";

@@ -48,7 +48,7 @@ public class AdminAuctionStatusServlet extends HttpServlet {
                     
                     // 2. 낙찰자에게 알림
                     String notiSql1 = "INSERT INTO notifications (user_id, auction_id, message, noti_type) " +
-                            "SELECT a.highest_bidder_id, a.auction_id, " +
+                            		"SELECT a.highest_bidder_id, a.auction_id, " +
                                       "CONCAT('낙찰하신 상품이 검수 불합격 처리되었습니다. 사유: ', ?, ' / 수령 또는 반품을 선택해주세요.'), " +
                                       "'REJECT_CHOICE' FROM auction a WHERE a.auction_id = ?";
                     try (PreparedStatement pstmtNoti = conn.prepareStatement(notiSql1)) {
