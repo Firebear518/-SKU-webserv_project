@@ -110,7 +110,8 @@ public class ProductDAO {
         	    "c.category_name, a.auction_id, a.current_price, a.end_time, a.auction_status " +
         	    "FROM products p " +
         	    "LEFT JOIN categories c ON p.category_id = c.category_id " +
-        	    "LEFT JOIN auction a ON a.product_id = p.product_id " +
+        	    "JOIN auction a ON a.product_id = p.product_id " +
+        	    "WHERE a.auction_status = 'ONGOING' " +
         	    "ORDER BY p.product_id DESC LIMIT ?";
 
         try (Connection conn = DBUtil.getConnection();
