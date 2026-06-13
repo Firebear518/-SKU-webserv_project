@@ -22,7 +22,6 @@
                         <h3 class="fw-bold text-dark mb-1"><i class="bi bi-gear-fill text-secondary"></i> 내 정보 관리</h3>
                         <p class="text-muted small mb-4">비밀번호 및 낙찰 시 수령할 배송지 정보를 수정할 수 있습니다.</p>
                         
-                        <!-- 성공 메시지 -->
                         <c:if test="${param.success == 'true'}">
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <i class="bi bi-check-circle"></i> 회원정보가 성공적으로 수정되었습니다!
@@ -30,7 +29,6 @@
                             </div>
                         </c:if>
                         
-                        <!-- 에러 메시지 -->
                         <c:if test="${param.error == 'empty'}">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="bi bi-exclamation-circle"></i> 모든 필드를 입력해주세요.
@@ -38,9 +36,30 @@
                             </div>
                         </c:if>
                         
+                        <c:if test="${param.error == 'emptyCurrentPassword'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> 비밀번호를 변경하려면 현재 비밀번호를 입력해야 합니다.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${param.error == 'wrongCurrentPassword'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> **현재 비밀번호가 일치하지 않습니다.** 다시 확인해 주세요.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+                        
                         <c:if test="${param.error == 'passwordMismatch'}">
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-circle"></i> 새 비밀번호가 일치하지 않습니다.
+                                <i class="bi bi-exclamation-circle"></i> 새 비밀번호가 서로 일치하지 않습니다.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${param.error == 'passwordTooShort'}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> 새 비밀번호는 최소 4자 이상이어야 합니다.
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         </c:if>
@@ -60,16 +79,25 @@
                                 <input type="text" class="form-control bg-light" value="${sessionScope.userId}" readonly>
                             </div>
                             
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label fw-semibold">현재 비밀번호</label>
+                                <input type="password" class="form-control" id="currentPassword" name="currentPassword" 
+                                       placeholder="비밀번호 변경 시에만 입력하세요" autocomplete="off">
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="newPassword" class="form-label fw-semibold">새 비밀번호</label>
-                                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="변경할 새 비밀번호" required>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" 
+                                           placeholder="변경할 새 비밀번호" autocomplete="new-password">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="newPasswordConfirm" class="form-label fw-semibold">새 비밀번호 확인</label>
-                                    <input type="password" class="form-control" id="newPasswordConfirm" name="newPasswordConfirm" placeholder="한번 더 입력" required>
+                                    <input type="password" class="form-control" id="newPasswordConfirm" name="newPasswordConfirm" 
+                                           placeholder="한번 더 입력" autocomplete="new-password">
                                 </div>
                             </div>
+
                             <div id="passwordError" class="form-text text-danger d-none mb-3">새 비밀번호가 서로 일치하지 않습니다.</div>
 
                             <hr class="my-4 text-muted">
@@ -79,20 +107,20 @@
                             <div class="mb-3">
                                 <label for="userPhone" class="form-label fw-semibold">배송 연락처</label>
                                 <input type="tel" class="form-control" id="userPhone" name="userPhone" 
-                                       value="${not empty user_phone ? user_phone : '010-0000-0000'}" 
+                                       value="${not empty sessionScope.user_phone ? sessionScope.user_phone : ''}" 
                                        placeholder="010-1234-5678" required>
                             </div>
 
                             <div class="mb-2">
                                 <label for="userAddress" class="form-label fw-semibold">배송지 주소</label>
                                 <input type="text" class="form-control" id="userAddress" name="userAddress" 
-                                       value="${not empty user_address ? user_address : ''}" 
+                                       value="${not empty sessionScope.user_address ? sessionScope.user_address : ''}" 
                                        placeholder="시/도 구/군 도로명" required>
                             </div>
                             <div class="mb-4">
                                 <label for="userAddressDetail" class="form-label fw-semibold">상세 주소</label>
                                 <input type="text" class="form-control" id="userAddressDetail" name="userAddressDetail" 
-                                       value="${not empty user_address_detail ? user_address_detail : ''}" 
+                                       value="${not empty sessionScope.user_address_detail ? sessionScope.user_address_detail : ''}" 
                                        placeholder="건물명, 층수, 호수 등" required>
                             </div>
 
@@ -139,7 +167,6 @@
                                         </thead>
                                         <tbody>   
                                         <c:forEach var="p" items="${myProducts}">
-                                            <%-- 상태 라벨/뱃지 --%>
                                             <c:set var="statusBadge" value="bg-secondary" />
                                             <c:set var="statusLabel" value="진행중" />
                                             <c:choose>
@@ -211,13 +238,22 @@
     <jsp:include page="/views/common/footer.jsp" />
 
     <script>
+    // ⭐ JavaScript 유효성 검사 수정
     function validateMypageForm() {
+        const currentPassword = document.getElementById('currentPassword').value;
         const newPassword = document.getElementById('newPassword').value;
         const confirm = document.getElementById('newPasswordConfirm').value;
         const errorDiv = document.getElementById('passwordError');
         
-        // 비밀번호를 변경하려고 값을 입력했을 때만 검증 수행
+        // 사용자가 새 비밀번호를 한 자라도 적었다면 검증 활성화
         if (newPassword.trim().length > 0) {
+            // 1. 현재 비밀번호를 입력 안 했을 때 거르기
+            if (currentPassword.trim().length === 0) {
+                alert("비밀번호를 변경하려면 원래 사용하던 '현재 비밀번호'를 입력하셔야 합니다.");
+                document.getElementById('currentPassword').focus();
+                return false;
+            }
+            // 2. 새 비밀번호와 확인용 비밀번호가 다를 때 거르기
             if (newPassword !== confirm) {
                 errorDiv.classList.remove('d-none');
                 document.getElementById('newPasswordConfirm').focus();
@@ -229,7 +265,6 @@
         return true;
     }
 
-    // 낙찰/유찰 결정 → 팀원 구현 엔드포인트(/auctionDecision)에 연결
     function decideAuction(auctionId, decision) {
         if (!auctionId) {
             alert("경매 정보가 없는 상품입니다.");
@@ -251,7 +286,6 @@
         .catch(() => alert("서버 오류가 발생했습니다."));
     }
 
-    // 상품 삭제 → /DeleteProductServlet (GET) 로 연결
     function deleteProduct(productId, title) {
         if (!confirm("'" + title + "' 상품을 삭제하시겠습니까?\n관련 경매/입찰/댓글 내역도 함께 삭제됩니다.")) return;
         location.href = "${pageContext.request.contextPath}/DeleteProductServlet?id=" + productId;

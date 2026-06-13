@@ -164,12 +164,12 @@ while (notiRs2.next()) {
                                 <i class="bi bi-person-circle text-warning"></i> <strong>${sessionScope.userId}</strong>님 환영합니다
                             </span>
                         </li>
-                        
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" href="${pageContext.request.contextPath}/views/user/myPage.jsp">
-                                <i class="bi bi-person-gear"></i> 내 정보 관리
+                            <a class="nav-link text-warning fw-semibold" href="${pageContext.request.contextPath}/user/myPage">
+                                <i class="bi bi-person-circle"></i> 마이페이지
                             </a>
                         </li>
+                        
                         <li class="nav-item">
                             <a class="nav-link text-light-50" href="${pageContext.request.contextPath}/user/logout">
                                 <i class="bi bi-box-arrow-left"></i> 로그아웃

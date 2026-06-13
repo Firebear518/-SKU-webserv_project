@@ -48,7 +48,7 @@ public class AdminAuctionStatusServlet extends HttpServlet {
                     
                     // 2. 낙찰자에게 알림
                     String notiSql1 = "INSERT INTO notifications (user_id, auction_id, message, noti_type) " +
-                                      "SELECT a.highest_bidder, a.auction_id, " +
+                            "SELECT a.highest_bidder_id, a.auction_id, " +
                                       "CONCAT('낙찰하신 상품이 검수 불합격 처리되었습니다. 사유: ', ?, ' / 수령 또는 반품을 선택해주세요.'), " +
                                       "'REJECT_CHOICE' FROM auction a WHERE a.auction_id = ?";
                     try (PreparedStatement pstmtNoti = conn.prepareStatement(notiSql1)) {
@@ -80,12 +80,12 @@ public class AdminAuctionStatusServlet extends HttpServlet {
                     // 🌟 5. [추가] 관리자가 상태를 "낙찰자에게 배송중"으로 변경하면 낙찰자에게 알림 전송
                     if ("낙찰자에게 배송중".equals(newStatus) || "검수완료".equals(newStatus) || "검수합격".equals(newStatus)) {
                         
-                        String findInfoSql = "SELECT a.highest_bidder, p.title FROM auction a JOIN products p ON a.product_id = p.product_id WHERE a.auction_id = ?";
+                    	String findInfoSql = "SELECT a.highest_bidder_id, p.title FROM auction a JOIN products p ON a.product_id = p.product_id WHERE a.auction_id = ?";
                         try (PreparedStatement psInfo = conn.prepareStatement(findInfoSql)) {
                             psInfo.setInt(1, auctionId);
                             try (ResultSet rs = psInfo.executeQuery()) {
                                 if (rs.next()) {
-                                    String buyerId = rs.getString("highest_bidder");
+                                	String buyerId = rs.getString("highest_bidder_id");
                                     String productName = rs.getString("title");
                                     
                                     // 낙찰자에게 알림 INSERT

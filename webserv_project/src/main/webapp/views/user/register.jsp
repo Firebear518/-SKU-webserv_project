@@ -35,6 +35,8 @@
                             <div class="mb-3">
                                 <label for="userId" class="form-label fw-semibold">아이디</label>
                                 <input type="text" class="form-control" id="userId" name="userId" placeholder="사용할 아이디 입력" required>
+                                <button type="button" onclick="checkId()">중복 확인</button>
+    <div id="idCheckResult" style="margin-top:5px;"></div>
                             </div>
 
                             <div class="mb-3">
@@ -99,8 +101,16 @@
                                 <span class="text-muted">이미 계정이 있으신가요?</span>
                                 <a href="${pageContext.request.contextPath}/views/user/login.jsp" class="text-primary fw-semibold text-decoration-none ms-1">로그인 하기</a>
                             </div>
-                            
-                        </form>
+                            <%
+    String error = (String)request.getAttribute("errorMessage");
+    if (error != null) {
+%>
+    <div style="color: red; margin-bottom: 10px;">
+        <%= error %>
+    </div>
+<%
+    }
+%>
                     </div>
                 </div>
             </div>
@@ -110,6 +120,26 @@
     <jsp:include page="/views/common/footer.jsp" />
 
     <script>
+    function checkId() {
+        var userId = document.getElementById("userId").value;
+        if (userId == "") {
+            alert("아이디를 입력해주세요.");
+            return;
+        }
+        
+        // 🌟 서버로 비동기 요청을 보내는 부분
+        // register.jsp
+        fetch('${pageContext.request.contextPath}/user/checkId?userId=' + encodeURIComponent(userId))
+        .then(response => response.text())
+        .then(data => {
+            console.log("서버 응답 raw:", JSON.stringify(data)); // ✅ 이 줄 추가해서 확인
+            if (data.trim() === "true") {
+                document.getElementById("idCheckResult").innerHTML = "<span style='color:red;'>이미 사용 중인 아이디입니다.</span>";
+            } else {
+                document.getElementById("idCheckResult").innerHTML = "<span style='color:green;'>사용 가능한 아이디입니다.</span>";
+            }
+        });
+    }
     function validateForm() {
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('passwordConfirm').value;

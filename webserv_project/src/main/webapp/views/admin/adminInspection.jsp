@@ -102,9 +102,9 @@
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection conn = DBUtil.getConnection();
 
-        String sql = "SELECT a.auction_id, p.title, p.seller_id, a.highest_bidder, a.current_price, a.status, a.reject_reason " +
-                     "FROM auction a JOIN products p ON a.product_id = p.product_id " +
-                     "WHERE a.status != 'active'";
+        String sql = "SELECT a.auction_id, p.title, p.seller_id, a.highest_bidder_id, a.current_price, IFNULL(a.status, '입고대기') AS status, a.reject_reason " +
+                "FROM auction a JOIN products p ON a.product_id = p.product_id " +
+                "WHERE a.auction_status = 'SOLD'";
 
         if ("대기중".equals(filter)) sql += " AND a.status = '입고대기'";
         else if ("검수중".equals(filter)) sql += " AND a.status = '검수중'";
@@ -147,7 +147,7 @@
                             <td><div class="fw-bold text-dark"><%= rs.getString("title") %></div></td>
                             <td>
                                 <div class="small">S: <%= rs.getString("seller_id") %></div>
-                                <div class="small text-primary font-monospace">B: <%= rs.getString("highest_bidder") != null ? rs.getString("highest_bidder") : "-" %></div>
+                                <div class="small text-primary font-monospace">B: <%= rs.getString("highest_bidder_id") != null ? rs.getString("highest_bidder_id") : "-" %></div>
                             </td>
                             <td class="fw-bold"><%= String.format("%,d", rs.getInt("current_price")) %>원</td>
                             <td><span class="badge rounded-pill <%= badgeClass %>" <%= tooltipAttr %>><%= badgeText %></span></td>

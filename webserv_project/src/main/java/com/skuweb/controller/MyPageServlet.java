@@ -58,11 +58,11 @@ public class MyPageServlet extends HttpServlet {
             rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                // DB에서 조회한 정보를 request에 저장
-                req.setAttribute("user_phone", rs.getString("userPhone"));
-                req.setAttribute("user_address", rs.getString("userAddress"));
-                req.setAttribute("user_address_detail", rs.getString("userAddressDetail"));
-                System.out.println("회원정보 조회 성공: " + userId);
+                // ⭐ 수정된 부분: JSP의 sessionScope와 짝을 맞추기 위해 session에 담아줍니다!
+                session.setAttribute("user_phone", rs.getString("userPhone"));
+                session.setAttribute("user_address", rs.getString("userAddress"));
+                session.setAttribute("user_address_detail", rs.getString("userAddressDetail"));
+                System.out.println("회원정보 조회 및 세션 저장 성공: " + userId);
             }
             
         } catch (SQLException e) {

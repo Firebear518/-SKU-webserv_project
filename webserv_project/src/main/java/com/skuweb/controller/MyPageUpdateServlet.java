@@ -9,12 +9,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import util.DBUtil;
 
 /**
  * Servlet implementation class MyPageUpdateServlet
- * 회원정보 수정 (비밀번호, 배송지 정보)
+ * 회원정보 수정 (기존 비밀번호 검증 추가)
  */
 @WebServlet("/user/myPageUpdate")
 public class MyPageUpdateServlet extends HttpServlet {
@@ -26,7 +27,7 @@ public class MyPageUpdateServlet extends HttpServlet {
         
         System.out.println("=== MyPageUpdateServlet doPost 시작 ===");
         
-        // ✅ 한글 입력값 처리
+        // 한글 입력값 처리
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         
@@ -43,32 +44,43 @@ public class MyPageUpdateServlet extends HttpServlet {
             return;
         }
 
-        // 1. 파라미터 값 가져오기 (비밀번호, 주소 등)
+        // 1. 파라미터 값 가져오기
+        String currentPassword = request.getParameter("currentPassword"); // ⭐ [추가] 현재 비밀번호
         String newPassword = request.getParameter("newPassword");
         String newPasswordConfirm = request.getParameter("newPasswordConfirm");
         String userPhone = request.getParameter("userPhone");
         String userAddress = request.getParameter("userAddress");
         String userAddressDetail = request.getParameter("userAddressDetail");
-        
-        System.out.println("2. 받은 파라미터:");
-        System.out.println("   - newPassword: " + newPassword);
-        System.out.println("   - newPasswordConfirm: " + newPasswordConfirm);
-        System.out.println("   - userPhone: " + userPhone);
-        System.out.println("   - userAddress: " + userAddress);
-        System.out.println("   - userAddressDetail: " + userAddressDetail);
+
+        // 비밀번호를 변경하러 들어왔는지 여부 체크
+        boolean isPasswordChange = (newPassword != null && !newPassword.trim().isEmpty());
 
         // 2. 입력값 검증
-        // 비밀번호 입력 여부 확인
-        if (newPassword == null || newPassword.trim().isEmpty()) {
-            System.out.println("❌ 비밀번호 입력 안 됨!");
-            response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=emptyPassword");
-            return;
-        }
-        
-        if (newPasswordConfirm == null || newPasswordConfirm.trim().isEmpty()) {
-            System.out.println("❌ 비밀번호 확인 입력 안 됨!");
-            response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=emptyPasswordConfirm");
-            return;
+        if (isPasswordChange) {
+            // 현재 비밀번호 입력 여부 확인
+            if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                System.out.println("❌ 현재 비밀번호 입력 안 됨!");
+                response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=emptyCurrentPassword");
+                return;
+            }
+            
+            if (newPasswordConfirm == null || newPasswordConfirm.trim().isEmpty()) {
+                System.out.println("❌ 새 비밀번호 확인 입력 안 됨!");
+                response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=emptyPasswordConfirm");
+                return;
+            }
+            
+            if (!newPassword.equals(newPasswordConfirm)) {
+                System.out.println("❌ 새 비밀번호 불일치!");
+                response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=passwordMismatch");
+                return;
+            }
+            
+            if (newPassword.length() < 4) {
+                System.out.println("❌ 새 비밀번호 너무 짧음!");
+                response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=passwordTooShort");
+                return;
+            }
         }
         
         // 배송지 정보 필수 입력 확인
@@ -79,113 +91,106 @@ public class MyPageUpdateServlet extends HttpServlet {
             return;
         }
 
-        // 비밀번호 일치 확인
-        if (!newPassword.equals(newPasswordConfirm)) {
-            System.out.println("❌ 비밀번호 불일치!");
-            response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=passwordMismatch");
-            return;
+        // 전화번호 하이픈 자동 삽입
+        String formattedPhone = userPhone.replaceAll("[^0-9]", "");
+        if (formattedPhone.length() == 11) {
+            formattedPhone = formattedPhone.replaceFirst("(\\d{3})(\\d{4})(\\d{4})", "$1-$2-$3");
+        } else if (formattedPhone.length() == 10) {
+            if (formattedPhone.startsWith("02")) {
+                formattedPhone = formattedPhone.replaceFirst("(\\d{2})(\\d{4})(\\d{4})", "$1-$2-$3");
+            } else {
+                formattedPhone = formattedPhone.replaceFirst("(\\d{3})(\\d{3})(\\d{4})", "$1-$2-$3");
+            }
+        } else if (formattedPhone.length() == 9) {
+            formattedPhone = formattedPhone.replaceFirst("(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3");
         }
-        
-        // 비밀번호 길이 검증 (최소 4자 이상)
-        if (newPassword.length() < 4) {
-            System.out.println("❌ 비밀번호 너무 짧음!");
-            response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=passwordTooShort");
-            return;
-        }
+        userPhone = formattedPhone;
 
-        System.out.println("3. ✅ 검증 완료!");
+        System.out.println("3. ✅ 기본 입력값 검증 완료!");
 
-        // 3. 데이터베이스 업데이트 로직
+        // 3. 데이터베이스 로직
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
         try {
-            // DB 연결
             conn = DBUtil.getConnection();
-            System.out.println("4. ✅ DB 연결 성공!");
-            
-            // ✅ Auto-commit 비활성화
-            conn.setAutoCommit(false);
-            System.out.println("4-1. Auto-commit 비활성화");
+            conn.setAutoCommit(false); // 트랜잭션 시작
 
-            // SQL 쿼리 작성
-            String sql = "UPDATE users SET password=?, userPhone=?, userAddress=?, userAddressDetail=? WHERE userId=?";
-            System.out.println("5. SQL: " + sql);
+            // ⭐ [추가] 비밀번호를 변경할 때만 현재 비밀번호 일치 여부를 DB에서 조회하여 검증
+            if (isPasswordChange) {
+                String checkSql = "SELECT password FROM users WHERE userId = ?";
+                pstmt = conn.prepareStatement(checkSql);
+                pstmt.setString(1, userId);
+                rs = pstmt.executeQuery();
+                
+                String dbPassword = null;
+                if (rs.next()) {
+                    dbPassword = rs.getString("password");
+                }
+                
+                // 자원 중간 정리
+                rs.close();
+                pstmt.close();
+                
+                // 입력한 현재 비밀번호가 DB에 저장된 비밀번호와 다르면 튕겨내기
+                if (dbPassword == null || !dbPassword.equals(currentPassword)) {
+                    System.out.println("❌ 현재 비밀번호가 DB와 일치하지 않음!");
+                    response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=wrongCurrentPassword");
+                    conn.rollback();
+                    return;
+                }
+            }
+
+            // 업데이트 SQL 작성 및 실행
+            String sql;
+            if (isPasswordChange) {
+                sql = "UPDATE users SET password=?, userPhone=?, userAddress=?, userAddressDetail=? WHERE userId=?";
+            } else {
+                sql = "UPDATE users SET userPhone=?, userAddress=?, userAddressDetail=? WHERE userId=?";
+            }
             
             pstmt = conn.prepareStatement(sql);
+            int paramIndex = 1;
 
-            // 파라미터 설정
-            pstmt.setString(1, newPassword);
-            pstmt.setString(2, userPhone.trim());
-            pstmt.setString(3, userAddress.trim());
-            pstmt.setString(4, userAddressDetail != null ? userAddressDetail.trim() : "");
-            pstmt.setString(5, userId);
+            if (isPasswordChange) {
+                pstmt.setString(paramIndex++, newPassword);
+            }
+            pstmt.setString(paramIndex++, userPhone.trim());
+            pstmt.setString(paramIndex++, userAddress.trim());
+            pstmt.setString(paramIndex++, userAddressDetail != null ? userAddressDetail.trim() : "");
+            pstmt.setString(paramIndex++, userId);
             
-            System.out.println("6. 파라미터 설정 완료");
-            System.out.println("   - 새 비밀번호: " + newPassword);
-            System.out.println("   - 새 전화번호: " + userPhone.trim());
-            System.out.println("   - 새 주소: " + userAddress.trim());
-            System.out.println("   - userId: " + userId);
-
-            // 쿼리 실행
             int result = pstmt.executeUpdate();
-            
-            System.out.println("7. 업데이트 결과: " + result + "행");
+            conn.commit(); // 성공 시 커밋
+            System.out.println("7. 업데이트 결과: " + result + "행 (COMMIT 완료)");
 
-            // ✅ Commit 실행 (중요!)
-            conn.commit();
-            System.out.println("7-1. ✅ COMMIT 실행됨!");
-
-            // 업데이트 성공 여부 확인
             if (result > 0) {
-                System.out.println("✅ DB 업데이트 성공!");
-                // 4. 성공 시 myPage.jsp로 리다이렉트 (쿼리 파라미터로 결과 전달)
+                // 세션 최신 정보로 갱신
+                session.setAttribute("user_phone", userPhone);
+                session.setAttribute("user_address", userAddress);
+                session.setAttribute("user_address_detail", userAddressDetail);
+                
                 response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?success=true");
             } else {
-                System.out.println("❌ 업데이트 실패 (일치하는 회원 없음)");
-                // 실패 시 (일치하는 회원이 없는 경우)
                 response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=updateFailed");
             }
 
         } catch (SQLException e) {
-            // SQL 예외 처리
-            System.out.println("❌ SQL 오류: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("DB 업데이트 오류: " + e.getMessage());
-            
-            // ✅ Rollback 실행
-            try {
-                if (conn != null) {
-                    conn.rollback();
-                    System.out.println("7-2. ⚠ ROLLBACK 실행됨!");
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=dbError");
-            
         } catch (Exception e) {
-            // 그 외 예외 처리
-            System.out.println("❌ 서버 오류: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("서버 오류: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/views/user/myPage.jsp?error=serverError");
-            
         } finally {
-            // 자원 정리
             try {
                 if (pstmt != null) pstmt.close();
                 if (conn != null) {
-                    conn.setAutoCommit(true);  // ✅ Auto-commit 다시 활성화
+                    conn.setAutoCommit(true);
                     conn.close();
                 }
-                System.out.println("8. ✅ 자원 정리 완료");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            } catch (SQLException e) { e.printStackTrace(); }
         }
-        
-        System.out.println("=== MyPageUpdateServlet doPost 종료 ===\n");
     }
 }
