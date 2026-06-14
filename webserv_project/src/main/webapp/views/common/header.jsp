@@ -166,14 +166,10 @@ while (notiRs2.next()) {
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-warning fw-semibold" href="${pageContext.request.contextPath}/user/myPage">
-                                <i class="bi bi-box-seam"></i> 내 상품 관리
+                                <i class="bi bi-person-circle"></i> 마이페이지
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white-50" href="${pageContext.request.contextPath}/views/user/myPageConfirm.jsp">
-                                <i class="bi bi-person-gear"></i> 내 정보 관리
-                            </a>
-                        </li>
+                        
                         <li class="nav-item">
                             <a class="nav-link text-light-50" href="${pageContext.request.contextPath}/user/logout">
                                 <i class="bi bi-box-arrow-left"></i> 로그아웃
